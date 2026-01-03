@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrasi Belajar</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@40,400,1,0" />
+</head>
+
+<body>
+
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar">
+        <div class="brand">
+            <div class="logo-icon">AB</div>
+            <span class="logo-text">Administrasi Belajar</span>
+        </div>
+
+        <ul class="nav-links">
+            <li class="active" data-target="home">
+                <a href="#">
+                    <span class="icon material-symbols-rounded">home</span>
+                    <span class="text">Dashboard</span>
+                </a>
+            </li>
+            <li class="section-title">PROJECTS</li>
+            <!-- DYNAMIC_SIDEBAR_START -->
+            <li data-target="projects/jadwal-mengajarku/index.html">
+                <a href="#">
+                    <span class="icon material-symbols-rounded">menu_book</span>
+                    <span class="text">Jadwal Mengajar</span>
+                </a>
+            </li>
+            <li data-target="projects/kalenderku/index.html">
+                <a href="#">
+                    <span class="icon material-symbols-rounded">calendar_month</span>
+                    <span class="text">Kalender</span>
+                </a>
+            </li>
+            <li data-target="projects/my-istri/index.html">
+                <a href="#">
+                    <span class="icon material-symbols-rounded">favorite</span>
+                    <span class="text">My Istri</span>
+                </a>
+            </li>
+            <!-- DYNAMIC_SIDEBAR_END -->
+        </ul>
+
+        <!-- Sidebar Footer Removed -->
+    </nav>
+
+    <!-- Mobile Overlay -->
+    <div class="overlay" onclick="toggleSidebar()"></div>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <header class="top-bar">
+            <!-- Mobile Menu Toggle -->
+            <button class="menu-toggle" onclick="toggleSidebar()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+            <div class="page-title">
+                <h2 id="current-page-title">Dashboard</h2>
+            </div>
+            <div class="action-buttons">
+                <button class="icon-btn" title="Refresh Project" onclick="refreshFrame()">↻</button>
+                <button class="icon-btn" title="Open New Tab" onclick="openNewTab()">↗</button>
+            </div>
+        </header>
+
+        <!-- Dynamic Content Wrapper -->
+        <div class="content-wrapper">
+
+            <!-- Dashboard View (Default) -->
+            <div id="dashboard-view" class="view-container active">
+                <div class="dashboard-hero">
+                    <h1>Selamat Datang, bro!</h1>
+                    <p>Pilih menu di sebelah kiri sesuai kebutuhanmu.</p>
+                </div>
+                <div class="width-limiter">
+                    <!-- Quick Stats / Cards can go here -->
+                    <div class="app-grid">
+                        <!-- DYNAMIC_GRID_START -->
+
+                        <!-- App Icon: jadwal-mengajarku -->
+                        <div class="app-item" onclick="loadProject('projects/jadwal-mengajarku/index.html', 'Jadwal Mengajar')">
+                            <div class="app-icon icon-grad-1">
+                                <span class="material-symbols-rounded">menu_book</span>
+                            </div>
+                            <span class="app-name">Jadwal Mengajar</span>
+                        </div>
+
+                        <!-- App Icon: kalenderku -->
+                        <div class="app-item" onclick="loadProject('projects/kalenderku/index.html', 'Kalender')">
+                            <div class="app-icon icon-grad-2">
+                                <span class="material-symbols-rounded">calendar_month</span>
+                            </div>
+                            <span class="app-name">Kalender</span>
+                        </div>
+
+                        <!-- App Icon: my-istri-8621 -->
+                        <div class="app-item" onclick="loadProject('projects/my-istri/index.html', 'My Istri')">
+                            <div class="app-icon icon-grad-2">
+                                <span class="material-symbols-rounded">favorite</span>
+                            </div>
+                            <span class="app-name">My Istri</span>
+                        </div>
+                        <!-- DYNAMIC_GRID_END -->
+
+                        <!-- Add New / Placeholder (Always Static) -->
+                        <div class="app-item dashed" onclick="window.open('http://localhost:3001/admin', '_blank')">
+                            <div class="app-icon"
+                                style="background: rgba(255,255,255,0.05); border: 2px dashed rgba(255,255,255,0.2);">
+                                <span class="material-symbols-rounded">add</span>
+                            </div>
+                            <span class="app-name">Tambah</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project Frame (Hidden by default) -->
+            <iframe id="project-frame" class="app-frame" src="" frameborder="0"></iframe>
+
+        </div>
+    </main>
+
+    <script src="assets/js/main.js"></script>
+</body>
+
+</html>
