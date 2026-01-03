@@ -12,12 +12,5 @@
     "path": "projects/kalenderku/index.html",
     "icon": "calendar_month",
     "gradient": "icon-grad-2"
-  },
-  {
-    "name": "My Istri",
-    "path": "projects/my-istri/index.html",
-    "icon": "favorite",
-    "gradient": "icon-grad-2",
-    "id": "my-istri-8621"
   }
 ]
