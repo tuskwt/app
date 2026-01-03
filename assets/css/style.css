@@ -310,7 +310,8 @@ body {
         height: 100dvh;
         transform: translateX(-100%);
         /* Hidden by default */
-        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
+		box-shadow: 0; /* tanpa shadow */
+ /*       box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5); */
     }
 
     .sidebar.open {
