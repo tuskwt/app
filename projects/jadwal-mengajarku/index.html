@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jadwal Mengajar Sekolah</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <header class="main-header">
+            <div class="profile-section">
+                <!-- Teacher selector will be rendered by JS -->
+            </div>
+            <div class="current-time">
+                <span id="clock">00:00:00</span>
+                <span id="date">Senin, 1 Januari 2024</span>
+            </div>
+        </header>
+
+        <main class="schedule-container">
+            <div class="mobile-tabs" id="day-tabs">
+                <!-- Tabs for mobile day selection -->
+            </div>
+
+            <div class="schedule-view" id="schedule-view">
+                <!-- Content will be day-based loops -->
+            </div>
+
+            <!-- Teaching Hours Statistics -->
+            <div class="stats-section" id="stats-section">
+                <!-- Stats will be rendered by JS -->
+            </div>
+        </main>
+
+        <script src="data.js"></script>
+        <script src="script.js"></script>
+    </div>
+</body>
+
+</html>
