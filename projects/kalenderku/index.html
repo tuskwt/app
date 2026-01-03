@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kalender Pendidikan Premium</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="data.js"></script>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #e0e7ff;
+            --date-red: #ef4444;
+            --date-red-bg: #fee2e2;
+            --date-green: #10b981;
+            --date-green-bg: #d1fae5;
+            --date-blue: #3b82f6;
+            --date-blue-bg: #dbeafe;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --bg-body: #f3f4f6;
+            --card-bg: #ffffff;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --radius: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            transition: background-color 0.3s;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin: 0;
+            letter-spacing: -0.025em;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            margin-top: 8px;
+            font-size: 1rem;
+        }
+
+        .calendar-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .month-card {
+            background-color: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 24px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: fadeInUp 0.6s ease backwards;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .month-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .month-header {
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .month-header::after {
+            content: '';
+            display: block;
+            width: 40px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 2px;
+            position: absolute;
+            bottom: -8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 6px;
+            /* Increased spacing */
+        }
+
+        th {
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            padding-bottom: 12px;
+            letter-spacing: 0.05em;
+        }
+
+        td {
+            text-align: center;
+            height: 44px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-main);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            cursor: default;
+        }
+
+        td[data-info] {
+            cursor: pointer;
+        }
+
+        td:hover:not(:empty) {
+            background-color: #f3f4f6;
+            transform: scale(1.1);
+            z-index: 2;
+        }
+
+        td.red {
+            color: var(--date-red);
+            background-color: var(--date-red-bg);
+        }
+
+        td.red:hover {
+            background-color: #fca5a5;
+            color: #7f1d1d;
+        }
+
+        td.green {
+            color: var(--date-green);
+            background-color: var(--date-green-bg);
+        }
+
+        td.green:hover {
+            background-color: #6ee7b7;
+            color: #064e3b;
+        }
+
+        td.blue {
+            color: var(--date-blue);
+            background-color: var(--date-blue-bg);
+        }
+
+        td.blue:hover {
+            background-color: #93c5fd;
+            color: #1e3a8a;
+        }
+
+        /* Floating Tooltip */
+        .tooltip {
+            position: fixed;
+            z-index: 1000;
+            padding: 12px 16px;
+            background: rgba(31, 41, 55, 0.95);
+            backdrop-filter: blur(4px);
+            color: white;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+            pointer-events: none;
+            opacity: 0;
+            transform: scale(0.9);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            max-width: 250px;
+            width: max-content;
+            text-align: center;
+            line-height: 1.5;
+            font-weight: 400;
+            white-space: normal;
+        }
+
+        .tooltip.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 640px) {
+            h1 {
+                font-size: 1.75rem;
+            }
+
+            .calendar-container {
+                gap: 16px;
+                padding-bottom: 40px;
+            }
+
+            body {
+                padding: 10px;
+            }
+
+            table {
+                border-spacing: 4px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1 id="year-title">Kalender</h1>
+        <p class="subtitle" id="work-days-info">Loading...</p>
+    </header>
+
+    <div class="calendar-container" id="calendar"></div>
+    <div id="tooltip" class="tooltip"></div>
+
+    <script>
+        const data = window.calendarData || {
+            year: 2026,
+            workDays: 6,
+            events: {}
+        };
+
+        const container = document.getElementById('calendar');
+        const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+        const days = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+        const yearTitle = document.getElementById('year-title');
+        const workDaysInfo = document.getElementById('work-days-info');
+
+        yearTitle.textContent = `Kalender Pendidikan ${data.year}`;
+        workDaysInfo.textContent = `${data.workDays} Hari Kerja (${data.workDays === 5 ? 'Sabtu & Minggu Libur' : 'Minggu Libur'})`;
+
+        for (let m = 0; m < 12; m++) {
+            const card = document.createElement('div');
+            card.className = 'month-card';
+            card.style.animationDelay = `${m * 0.05}s`;
+
+            const header = document.createElement('div');
+            header.className = 'month-header';
+            header.textContent = months[m];
+            card.appendChild(header);
+
+            const table = document.createElement('table');
+            const thead = document.createElement('tr');
+
+            days.forEach(d => {
+                const th = document.createElement('th');
+                th.textContent = d;
+                if (d === 'Min' || (data.workDays === 5 && d === 'Sab')) {
+                    th.style.color = '#ef4444';
+                }
+                thead.appendChild(th);
+            });
+            table.appendChild(thead);
+
+            const firstDayIndex = new Date(data.year, m, 1).getDay();
+            const totalDays = new Date(data.year, m + 1, 0).getDate();
+
+            let tr = document.createElement('tr');
+            for (let i = 0; i < firstDayIndex; i++) tr.appendChild(document.createElement('td'));
+
+            for (let d = 1; d <= totalDays; d++) {
+                if (tr.children.length === 7) {
+                    table.appendChild(tr);
+                    tr = document.createElement('tr');
+                }
+
+                const td = document.createElement('td');
+                td.textContent = d;
+
+                const monthStr = String(m + 1).padStart(2, '0');
+                const dayStr = String(d).padStart(2, '0');
+                const dateString = `${data.year}-${monthStr}-${dayStr}`;
+                const dayOfWeek = new Date(data.year, m, d).getDay();
+
+                if (data.events[dateString]) {
+                    td.classList.add(data.events[dateString].type);
+                    td.setAttribute('data-info', data.events[dateString].label);
+                } else if (dayOfWeek === 6 && data.workDays === 5) {
+                    td.classList.add('red');
+                    td.setAttribute('data-info', 'Libur Sabtu');
+                } else if (dayOfWeek === 0) {
+                    td.classList.add('red');
+                    td.setAttribute('data-info', 'Libur Minggu');
+                }
+                tr.appendChild(td);
+            }
+
+            while (tr.children.length < 7) tr.appendChild(document.createElement('td'));
+            table.appendChild(tr);
+            card.appendChild(table);
+            container.appendChild(card);
+        }
+
+        const tooltip = document.getElementById('tooltip');
+        let hideTimeout;
+        let activeElement = null;
+
+        function updateTooltipPosition(element) {
+            const info = element.getAttribute('data-info');
+            if (!info) return;
+
+            tooltip.textContent = info;
+            tooltip.classList.add('visible');
+
+            const rect = element.getBoundingClientRect();
+            const tipRect = tooltip.getBoundingClientRect();
+            const padding = 10;
+            const windowWidth = document.documentElement.clientWidth;
+
+            // Calculate Position
+            let top = rect.top - tipRect.height - padding;
+            let left = rect.left + (rect.width / 2) - (tipRect.width / 2);
+
+            // Boundary Checks
+            if (top < padding) top = rect.bottom + padding; // Flip to bottom
+            if (left < padding) left = padding; // Left Edge
+            if (left + tipRect.width > windowWidth - padding) left = windowWidth - tipRect.width - padding; // Right Edge
+
+            tooltip.style.top = `${top}px`;
+            tooltip.style.left = `${left}px`;
+        }
+
+        function hideTooltip() {
+            tooltip.classList.remove('visible');
+        }
+
+        // Event Listeners
+        document.body.addEventListener('mouseover', (e) => {
+            if (window.matchMedia('(hover: hover)').matches) {
+                if (e.target.tagName === 'TD' && e.target.hasAttribute('data-info')) {
+                    updateTooltipPosition(e.target);
+                }
+            }
+        });
+
+        document.body.addEventListener('mouseout', (e) => {
+            if (window.matchMedia('(hover: hover)').matches) {
+                if (e.target.tagName === 'TD') {
+                    hideTooltip();
+                }
+            }
+        });
+
+        document.body.addEventListener('click', (e) => {
+            if (e.target.tagName === 'TD' && e.target.hasAttribute('data-info')) {
+                // If clicking same element, toggle off
+                if (activeElement === e.target && tooltip.classList.contains('visible')) {
+                    hideTooltip();
+                    activeElement = null;
+                } else {
+                    updateTooltipPosition(e.target);
+                    activeElement = e.target;
+
+                    clearTimeout(hideTimeout);
+                    hideTimeout = setTimeout(() => {
+                        hideTooltip();
+                        activeElement = null;
+                    }, 3000);
+                }
+                e.preventDefault();
+                e.stopPropagation();
+            } else {
+                hideTooltip();
+                activeElement = null;
+            }
+        });
+
+        window.addEventListener('scroll', () => {
+            if (activeElement) hideTooltip();
+        }, { passive: true });
+    </script>
+</body>
+
+</html>
