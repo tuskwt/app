@@ -668,6 +668,59 @@ const appData = {
                     }
                 ]
             }
+        },
+        {
+            "id": "1767538606199",
+            "name": "Den",
+            "code": "AG",
+            "schedule": {
+                "Senin": [
+                    {
+                        "periods": [
+                            7
+                        ],
+                        "class": "X TSM.2"
+                    }
+                ],
+                "Selasa": [],
+                "Rabu": [
+                    {
+                        "periods": [
+                            3,
+                            4
+                        ],
+                        "class": "X TSM.1"
+                    },
+                    {
+                        "periods": [
+                            6
+                        ],
+                        "class": "X TSM.2"
+                    },
+                    {
+                        "periods": [
+                            7,
+                            8
+                        ],
+                        "class": "X TP"
+                    },
+                    {
+                        "periods": [
+                            10
+                        ],
+                        "class": "X TKR"
+                    }
+                ],
+                "Kamis": [
+                    {
+                        "periods": [
+                            8
+                        ],
+                        "class": "X TKR"
+                    }
+                ],
+                "Jumat": []
+            }
         }
     ]
 };
