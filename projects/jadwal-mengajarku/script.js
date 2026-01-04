@@ -183,7 +183,7 @@ function renderTeacherSelector() {
             document.querySelectorAll('.custom-option').forEach(el => el.classList.remove('selected'));
             option.classList.add('selected');
 
-            renderSchedule();
+            renderSchedule(false);
             e.stopPropagation();
         });
 
@@ -222,6 +222,11 @@ function renderSchedule(autoScroll = true) {
     if (!teacher) return;
 
     const container = document.getElementById('schedule-view');
+
+    // Save current scroll position to prevent browser-initiated jumps
+    const savedScrollX = window.scrollX;
+    const savedScrollY = window.scrollY;
+
     // Set min-height to prevent scroll jump when clearing content, only if it has height
     if (container.offsetHeight > 0) {
         container.style.minHeight = container.offsetHeight + 'px';
@@ -420,6 +425,12 @@ function renderSchedule(autoScroll = true) {
 
     // Reset min-height after rendering
     container.style.minHeight = '';
+
+    // If autoScroll is false, explicitly restore the scroll position
+    if (!autoScroll) {
+        window.scrollTo(savedScrollX, savedScrollY);
+    }
+
     isInitialLoad = false;
 }
 
