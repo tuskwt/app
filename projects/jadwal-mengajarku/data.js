@@ -312,7 +312,7 @@ const appData = {
                             1,
                             2
                         ],
-                        "class": "X DKV & TJKT"
+                        "class": "X TJKT & X DKV"
                     },
                     {
                         "periods": [
@@ -392,7 +392,7 @@ const appData = {
                             9,
                             10
                         ],
-                        "class": "X DKV & TJKT"
+                        "class": "X TJKT & X DKV"
                     }
                 ],
                 "Jumat": [
@@ -468,7 +468,7 @@ const appData = {
                             9,
                             10
                         ],
-                        "class": "X TJKT & DKV"
+                        "class": "X TJKT & X DKV"
                     },
                     {
                         "periods": [
@@ -541,7 +541,7 @@ const appData = {
                             1,
                             2
                         ],
-                        "class": "X DKV & X TJKT"
+                        "class": "X TJKT & X DKV"
                     }
                 ],
                 "Jumat": [

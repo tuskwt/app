@@ -217,6 +217,7 @@ function renderSchedule() {
     });
 
     // Render Statistics
+    renderClassStats(teacher);
     renderStats(hoursPerDay, totalWeeklyHours);
 
     // Auto-select today
@@ -231,6 +232,89 @@ function renderSchedule() {
         const tabs = document.querySelectorAll('.day-tab');
         if (tabs.length > 0) tabs[0].click();
     }
+}
+
+// --- Helper ---
+function isTeachingPeriod(day, period) {
+    const daySchedule = bellSchedule[day];
+    const slot = daySchedule.find(s => s.period === period);
+    if (!slot) return false;
+    // Hitungan tidak termasuk Upacara & P5
+    if (slot.type === "Upacara" || slot.type === "P5") return false;
+    if (slot.period === "Rest") return false;
+    return true;
+}
+
+// --- Render Class Statistics ---
+function renderClassStats(teacher) {
+    const classStatsSection = document.getElementById('class-stats-section');
+    if (!classStatsSection) return;
+
+    classStatsSection.innerHTML = '';
+
+    const classHours = {};
+
+    // Calculate hours per class
+    days.forEach(day => {
+        const teacherClasses = teacher.schedule[day] || [];
+        teacherClasses.forEach(cls => {
+            const className = cls.class;
+            if (!classHours[className]) {
+                classHours[className] = {
+                    total: 0,
+                    breakdown: []
+                };
+            }
+
+            const validPeriods = cls.periods.filter(p => isTeachingPeriod(day, p));
+            const count = validPeriods.length;
+
+            if (count > 0) {
+                classHours[className].total += count;
+                classHours[className].breakdown.push(`${day}: ${count} Jam`);
+            }
+        });
+    });
+
+    if (Object.keys(classHours).length === 0) return;
+
+    const container = document.createElement('div');
+    container.className = 'class-stats-container';
+
+    const title = document.createElement('h3');
+    title.className = 'stats-title';
+    title.textContent = '📚 Jumlah Jam Per Kelas';
+    container.appendChild(title);
+
+    const list = document.createElement('div');
+    list.className = 'class-stats-list';
+
+    for (const className in classHours) {
+        const data = classHours[className];
+        const item = document.createElement('div');
+        item.className = 'class-stat-item';
+
+        // Determine color class
+        let colorClass = 'border-default';
+        if (className.includes('TP')) colorClass = 'border-tp';
+        else if (className.includes('TKR')) colorClass = 'border-tkr';
+        else if (className.includes('TSM')) colorClass = 'border-tsm';
+        else if (className.includes('TJKT') || className.includes('DKV')) colorClass = 'border-tjkt';
+
+        item.classList.add(colorClass);
+
+        item.innerHTML = `
+            <div class="class-stat-main">
+                <span class="class-stat-name">${className}</span>
+                <span class="class-stat-total"> = ${data.total} Jam</span>
+            </div>
+            <div class="class-stat-details">(${data.breakdown.join(' & ')})</div>
+        `;
+        list.appendChild(item);
+    }
+
+    container.appendChild(list);
+    classStatsSection.appendChild(container);
 }
 
 // --- Render Statistics ---
