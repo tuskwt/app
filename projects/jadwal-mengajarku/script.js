@@ -132,8 +132,7 @@ function renderSearchResults(results) {
 
             item.addEventListener('click', () => {
                 // Focus on the day
-                const tab = Array.from(document.querySelectorAll('.day-tab')).find(t => t.textContent.toLowerCase() === res.day.substring(0, 3).toLowerCase());
-                if (tab) tab.click();
+                switchDay(res.day, true);
 
                 document.getElementById('schedule-search').value = res.class;
                 searchResults.classList.remove('active');
@@ -240,7 +239,7 @@ function renderSchedule(autoScroll = true) {
         tab.textContent = day.substring(0, 3);
 
         tab.onclick = () => {
-            switchDay(day, true);
+            switchDay(day, false);
         };
         tabsContainer.appendChild(tab);
     });
@@ -438,7 +437,7 @@ function switchDay(day, autoScroll = true) {
         document.querySelectorAll('.day-column').forEach(d => d.classList.remove('mobile-active'));
         dayCard.classList.add('mobile-active');
         if (autoScroll) {
-            dayCard.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            dayCard.scrollIntoView({ block: 'nearest', inline: 'center' });
         }
     }
 }
