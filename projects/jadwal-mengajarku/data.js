@@ -316,6 +316,7 @@ const appData = {
                     },
                     {
                         "periods": [
+                            3,
                             4
                         ],
                         "class": "XI TP"
