@@ -27,6 +27,105 @@ if (!teachers.find(t => t.id === currentTeacherId)) {
 function initApp() {
     renderTeacherSelector();
     renderSchedule();
+    initSearch();
+}
+
+// --- Search Logic ---
+function initSearch() {
+    const searchInput = document.getElementById('schedule-search');
+    const searchResults = document.getElementById('search-results');
+
+    if (!searchInput || !searchResults) return;
+
+    searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        if (query.length < 2) {
+            searchResults.classList.remove('active');
+            return;
+        }
+
+        const teacher = teachers.find(t => t.id === currentTeacherId);
+        if (!teacher) return;
+
+        const results = [];
+        days.forEach(day => {
+            const daySchedule = teacher.schedule[day] || [];
+            daySchedule.forEach(cls => {
+                if (cls.class.toLowerCase().includes(query)) {
+                    // Find period details
+                    const periods = cls.periods.join(', ');
+                    const timeRange = getTimeRangeForPeriods(day, cls.periods);
+
+                    results.push({
+                        day,
+                        class: cls.class,
+                        periods,
+                        time: timeRange
+                    });
+                }
+            });
+        });
+
+        renderSearchResults(results);
+    });
+
+    // Close results when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+            searchResults.classList.remove('active');
+        }
+    });
+}
+
+function getTimeRangeForPeriods(day, periods) {
+    const dayBell = bellSchedule[day];
+    const firstPeriod = periods[0];
+    const lastPeriod = periods[periods.length - 1];
+
+    const startSlot = dayBell.find(s => s.period === firstPeriod);
+    const endSlot = dayBell.find(s => s.period === lastPeriod);
+
+    if (!startSlot || !endSlot) return '';
+
+    const startTime = startSlot.time.split('-')[0].trim();
+    const endTime = endSlot.time.indexOf('-') !== -1 ? endSlot.time.split('-')[1].trim() : '';
+
+    return `${startTime} - ${endTime}`;
+}
+
+function renderSearchResults(results) {
+    const searchResults = document.getElementById('search-results');
+    searchResults.innerHTML = '';
+
+    if (results.length === 0) {
+        searchResults.innerHTML = '<div class="search-result-item" style="color: var(--text-muted); text-align: center;">Tidak ada jadwal ditemukan</div>';
+    } else {
+        results.forEach(res => {
+            const item = document.createElement('div');
+            item.className = 'search-result-item';
+            item.innerHTML = `
+                <span class="result-day">${res.day}</span>
+                <span class="result-class">${res.class}</span>
+                <div class="result-info">
+                    <span>Jam Ke: ${res.periods}</span>
+                    <span>${res.time}</span>
+                </div>
+            `;
+
+            item.addEventListener('click', () => {
+                // Focus on the day
+                const tab = Array.from(document.querySelectorAll('.day-tab')).find(t => t.textContent.toLowerCase() === res.day.substring(0, 3).toLowerCase());
+                if (tab) tab.click();
+
+                document.getElementById('schedule-search').value = res.class;
+                searchResults.classList.remove('active');
+            });
+
+            searchResults.appendChild(item);
+        });
+    }
+
+    searchResults.classList.add('active');
 }
 
 // --- Teacher Selector ---
@@ -188,7 +287,6 @@ function renderSchedule() {
                             ${periodBadge}
                             <span class="class-title">${classInfo.class}</span>
                         </div>
-                        <div class="class-details">Ruang Kelas</div>
                     `;
                 } else if (slot.type) {
                     item.classList.add('item-special');
@@ -289,7 +387,33 @@ function renderClassStats(teacher) {
     const list = document.createElement('div');
     list.className = 'class-stats-list';
 
-    for (const className in classHours) {
+    const sortedClasses = Object.keys(classHours).sort((a, b) => {
+        const getGrade = (name) => {
+            if (name.includes('XII')) return 3;
+            if (name.includes('XI')) return 2;
+            if (name.includes('X')) return 1;
+            return 0;
+        };
+        const getMajorPriority = (name) => {
+            const majors = ['TP', 'TKR', 'TSM', 'TJKT', 'DKV'];
+            for (let i = 0; i < majors.length; i++) {
+                if (name.includes(majors[i])) return i + 1;
+            }
+            return 99;
+        };
+
+        const gradeA = getGrade(a);
+        const gradeB = getGrade(b);
+        if (gradeA !== gradeB) return gradeA - gradeB;
+
+        const majorA = getMajorPriority(a);
+        const majorB = getMajorPriority(b);
+        if (majorA !== majorB) return majorA - majorB;
+
+        return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+    });
+
+    for (const className of sortedClasses) {
         const data = classHours[className];
         const item = document.createElement('div');
         item.className = 'class-stat-item';
