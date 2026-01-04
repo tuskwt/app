@@ -23,6 +23,9 @@ if (!teachers.find(t => t.id === currentTeacherId)) {
     currentTeacherId = teachers[0]?.id || null;
 }
 
+// Track active day for mobile view
+let currentActiveDay = null;
+
 const SHIFT_STORAGE_KEY = 'jadwal_dayShifts';
 // Default to 0 for each day
 let dayShifts = JSON.parse(localStorage.getItem(SHIFT_STORAGE_KEY)) || {
@@ -209,15 +212,18 @@ window.toggleDayShift = (day) => {
     // Toggle between 0 and 1
     dayShifts[day] = dayShifts[day] === 0 ? 1 : 0;
     localStorage.setItem(SHIFT_STORAGE_KEY, JSON.stringify(dayShifts));
-    renderSchedule();
+    // Re-render without forcing scroll jump
+    renderSchedule(false);
 };
 
 // --- Render Schedule ---
-function renderSchedule() {
+function renderSchedule(autoScroll = true) {
     const teacher = teachers.find(t => t.id === currentTeacherId);
     if (!teacher) return;
 
     const container = document.getElementById('schedule-view');
+    // Set min-height to prevent scroll jump when clearing content
+    container.style.minHeight = container.offsetHeight + 'px';
     container.innerHTML = '';
 
     const tabsContainer = document.getElementById('day-tabs');
@@ -234,15 +240,7 @@ function renderSchedule() {
         tab.textContent = day.substring(0, 3);
 
         tab.onclick = () => {
-            document.querySelectorAll('.day-tab').forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-
-            const dayCard = document.getElementById(`day-${day}`);
-            if (dayCard) {
-                dayCard.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-                document.querySelectorAll('.day-column').forEach(d => d.classList.remove('mobile-active'));
-                dayCard.classList.add('mobile-active');
-            }
+            switchDay(day, true);
         };
         tabsContainer.appendChild(tab);
     });
@@ -409,17 +407,39 @@ function renderSchedule() {
     renderClassStats(teacher);
     renderStats(hoursPerDay, totalWeeklyHours);
 
-    // Auto-select today
-    const currentDayName = new Date().toLocaleDateString('id-ID', { weekday: 'long' });
-    const todayIndex = days.indexOf(currentDayName);
-    if (todayIndex !== -1) {
-        const tabs = document.querySelectorAll('.day-tab');
-        if (tabs[todayIndex]) {
-            tabs[todayIndex].click();
+    // Auto-select today or maintain active day
+    if (!currentActiveDay) {
+        const currentDayName = new Date().toLocaleDateString('id-ID', { weekday: 'long' });
+        const todayIndex = days.indexOf(currentDayName);
+        currentActiveDay = todayIndex !== -1 ? currentDayName : days[0];
+    }
+
+    switchDay(currentActiveDay, autoScroll);
+
+    // Reset min-height after rendering
+    container.style.minHeight = '';
+}
+
+// --- Helper: Switch Active Day ---
+function switchDay(day, autoScroll = true) {
+    currentActiveDay = day;
+    const tabs = document.querySelectorAll('.day-tab');
+    const dayIndex = days.indexOf(day);
+
+    if (tabs.length > 0) {
+        tabs.forEach(t => t.classList.remove('active'));
+        if (dayIndex !== -1 && tabs[dayIndex]) {
+            tabs[dayIndex].classList.add('active');
         }
-    } else {
-        const tabs = document.querySelectorAll('.day-tab');
-        if (tabs.length > 0) tabs[0].click();
+    }
+
+    const dayCard = document.getElementById(`day-${day}`);
+    if (dayCard) {
+        document.querySelectorAll('.day-column').forEach(d => d.classList.remove('mobile-active'));
+        dayCard.classList.add('mobile-active');
+        if (autoScroll) {
+            dayCard.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
     }
 }
 
