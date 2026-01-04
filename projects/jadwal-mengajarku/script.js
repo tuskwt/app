@@ -23,6 +23,18 @@ if (!teachers.find(t => t.id === currentTeacherId)) {
     currentTeacherId = teachers[0]?.id || null;
 }
 
+const SHIFT_STORAGE_KEY = 'jadwal_dayShifts';
+// Default to 0 for each day
+let dayShifts = JSON.parse(localStorage.getItem(SHIFT_STORAGE_KEY)) || {
+    'Senin': 0, 'Selasa': 0, 'Rabu': 0, 'Kamis': 0, 'Jumat': 0
+};
+
+// backward compatibility
+if (typeof dayShifts === 'number') {
+    const val = dayShifts;
+    dayShifts = { 'Senin': val, 'Selasa': val, 'Rabu': val, 'Kamis': val, 'Jumat': val };
+}
+
 // --- Init ---
 function initApp() {
     renderTeacherSelector();
@@ -50,11 +62,12 @@ function initSearch() {
         const results = [];
         days.forEach(day => {
             const daySchedule = teacher.schedule[day] || [];
+            const currentShift = dayShifts[day] || 0;
             daySchedule.forEach(cls => {
                 if (cls.class.toLowerCase().includes(query)) {
                     // Find period details
                     const periods = cls.periods.join(', ');
-                    const timeRange = getTimeRangeForPeriods(day, cls.periods);
+                    const timeRange = getTimeRangeForPeriods(day, cls.periods, currentShift);
 
                     results.push({
                         day,
@@ -77,10 +90,12 @@ function initSearch() {
     });
 }
 
-function getTimeRangeForPeriods(day, periods) {
+function getTimeRangeForPeriods(day, periods, shift = 0) {
     const dayBell = bellSchedule[day];
-    const firstPeriod = periods[0];
-    const lastPeriod = periods[periods.length - 1];
+    // If shift is 1, a class at period 2 moves to period 1's time slot.
+    // So we lookup the bell schedule for (period - shift)
+    const firstPeriod = periods[0] - shift;
+    const lastPeriod = periods[periods.length - 1] - shift;
 
     const startSlot = dayBell.find(s => s.period === firstPeriod);
     const endSlot = dayBell.find(s => s.period === lastPeriod);
@@ -189,6 +204,14 @@ function renderTeacherSelector() {
     });
 }
 
+// Global function for day header inputs
+window.toggleDayShift = (day) => {
+    // Toggle between 0 and 1
+    dayShifts[day] = dayShifts[day] === 0 ? 1 : 0;
+    localStorage.setItem(SHIFT_STORAGE_KEY, JSON.stringify(dayShifts));
+    renderSchedule();
+};
+
 // --- Render Schedule ---
 function renderSchedule() {
     const teacher = teachers.find(t => t.id === currentTeacherId);
@@ -231,26 +254,52 @@ function renderSchedule() {
         column.id = `day-${day}`;
         if (index === 0) column.classList.add('mobile-active');
 
+        const currentShift = dayShifts[day] || 0;
+
         const header = document.createElement('div');
         header.className = 'day-header';
-        header.innerHTML = `<h3>${day}</h3>`;
+
+        let shiftControlHtml = '';
+        if (day === 'Senin' || day === 'Jumat') {
+            shiftControlHtml = `
+                <button class="shift-toggle-btn ${currentShift > 0 ? 'active' : ''}" 
+                        onclick="toggleDayShift('${day}')">
+                    ${currentShift > 0 ? 'Normal' : 'Maju 1X'}
+                </button>
+            `;
+        }
+
+        header.innerHTML = `
+            <div class="day-header-content">
+                <h3>${day}</h3>
+                ${shiftControlHtml}
+            </div>
+        `;
         column.appendChild(header);
 
         const timeline = document.createElement('div');
         timeline.className = 'timeline-list';
 
         const daySchedule = bellSchedule[day];
+        const numericPeriods = daySchedule.filter(s => typeof s.period === 'number').map(s => s.period);
+        const maxDayPeriod = numericPeriods.length > 0 ? Math.max(...numericPeriods) : 0;
 
         // Calculate hours for this day
         const teacherClasses = teacher.schedule[day] || [];
         let dayHours = 0;
         teacherClasses.forEach(cls => {
-            dayHours += cls.periods.length; // Each period = 1 jam pelajaran
+            dayHours += cls.periods.length;
         });
         hoursPerDay[day] = dayHours;
         totalWeeklyHours += dayHours;
 
         daySchedule.forEach((slot, sIndex) => {
+            const originalPeriod = slot.period;
+
+            // If shifting, hide the empty slots at the end of the day
+            if (currentShift > 0 && typeof originalPeriod === 'number' && originalPeriod > (maxDayPeriod - currentShift)) {
+                return;
+            }
             const item = document.createElement('div');
             item.className = 'timeline-item';
 
@@ -264,7 +313,7 @@ function renderSchedule() {
             const contentCol = document.createElement('div');
             contentCol.className = 'content-col';
 
-            if (slot.period === "Rest") {
+            if (originalPeriod === "Rest") {
                 item.classList.add('item-rest');
                 contentCol.innerHTML = `
                     <div class="class-header">
@@ -272,19 +321,56 @@ function renderSchedule() {
                         <span class="rest-title">${slot.label || 'Istirahat'}</span>
                     </div>
                 `;
+            } else if (currentShift > 0 && typeof originalPeriod === 'number') {
+                const advancedPeriod = originalPeriod + currentShift;
+                const classInfoShift = teacherClasses.find(c => c.periods.includes(advancedPeriod));
+
+                // Info aslinya untuk tooltip/konteks
+                const classInfoOrig = teacherClasses.find(c => c.periods.includes(originalPeriod));
+                const originalType = slot.type;
+                let origDesc = originalType || (classInfoOrig ? classInfoOrig.class : 'Kosong');
+
+                if (classInfoShift) {
+                    item.classList.add('item-class');
+                    let colorClass = 'border-default';
+                    if (classInfoShift.class.includes('TP')) colorClass = 'border-tp';
+                    else if (classInfoShift.class.includes('TKR')) colorClass = 'border-tkr';
+                    else if (classInfoShift.class.includes('TSM')) colorClass = 'border-tsm';
+                    else if (classInfoShift.class.includes('TJKT') || classInfoShift.class.includes('DKV')) colorClass = 'border-tjkt';
+                    item.classList.add(colorClass);
+
+                    contentCol.innerHTML = `
+                        <div class="class-header">
+                            <div class="badge-group">
+                                <span class="period-badge shift-orig-badge" title="Aslinya: ${origDesc}">${advancedPeriod}</span>
+                                <span class="period-badge shift-current-badge">${originalPeriod}</span>
+                            </div>
+                            <span class="class-title">${classInfoShift.class}</span>
+                        </div>
+                    `;
+                } else {
+                    item.classList.add('item-empty');
+                    contentCol.innerHTML = `
+                        <div class="empty-header">
+                            <div class="badge-group">
+                                <span class="period-badge shift-orig-badge" title="Aslinya: ${origDesc}">${advancedPeriod}</span>
+                                <span class="period-badge shift-current-badge">${originalPeriod}</span>
+                            </div>
+                            <span class="empty-title">Kosong</span>
+                        </div>
+                    `;
+                }
             } else {
-                const classInfo = teacherClasses.find(c => c.periods.includes(slot.period));
-                const periodBadge = `<span class="period-badge">${slot.period}</span>`;
+                const classInfo = teacherClasses.find(c => c.periods.includes(originalPeriod));
+                const periodBadge = `<span class="period-badge">${originalPeriod}</span>`;
 
                 if (classInfo) {
                     item.classList.add('item-class');
-
                     let colorClass = 'border-default';
                     if (classInfo.class.includes('TP')) colorClass = 'border-tp';
                     else if (classInfo.class.includes('TKR')) colorClass = 'border-tkr';
                     else if (classInfo.class.includes('TSM')) colorClass = 'border-tsm';
                     else if (classInfo.class.includes('TJKT') || classInfo.class.includes('DKV')) colorClass = 'border-tjkt';
-
                     item.classList.add(colorClass);
 
                     contentCol.innerHTML = `

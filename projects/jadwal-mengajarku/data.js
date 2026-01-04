@@ -4,7 +4,7 @@ const appData = {
             {
                 "period": 1,
                 "time": "07.00 - 07.39",
-                "type": "Upacara"
+                "type": "Upacara / Pembinaan"
             },
             {
                 "period": 2,
@@ -217,7 +217,7 @@ const appData = {
             {
                 "period": 1,
                 "time": "07.00 - 07.40",
-                "type": "P5"
+                "type": "P5 / Pembinaan"
             },
             {
                 "period": 2,
