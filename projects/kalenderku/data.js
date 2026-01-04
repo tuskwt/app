@@ -131,7 +131,91 @@ window.calendarData = {
             "type": "green"
         },
         "2026-10-01": {
-            "label": "Berganti nama \"STM/SMK Sukawati Sragen\" pada 1 Oktober 1976.",
+            "label": "Hari Kesaktian Pancasila & Hari Pergantian Nama Baru \"STM Persiapan I Sragen\" Menjadi \"STM/SMK Sukawati Sragen\" pada 1 Oktober 1976.",
+            "type": "green"
+        },
+        "2026-07-05": {
+            "label": "Hari Bank Indonesia",
+            "type": "red"
+        },
+        "2026-07-12": {
+            "label": "Hari Koperasi Indonesia",
+            "type": "red"
+        },
+        "2026-07-23": {
+            "label": "Hari Anak Nasional",
+            "type": "green"
+        },
+        "2026-07-24": {
+            "label": "Hari Kebaya Nasional",
+            "type": "green"
+        },
+        "2026-08-10": {
+            "label": "Hari Veteran Nasional & Hari Kebangkitan Teknologi Nasional",
+            "type": "green"
+        },
+        "2026-08-14": {
+            "label": "Hari Pramuka",
+            "type": "green"
+        },
+        "2026-09-08": {
+            "label": "Hari Aksara Internasional",
+            "type": "green"
+        },
+        "2026-09-09": {
+            "label": "Hari Olahraga Nasional",
+            "type": "green"
+        },
+        "2026-09-17": {
+            "label": "Hari Perhubungan Nasional",
+            "type": "green"
+        },
+        "2026-09-24": {
+            "label": "Hari Tani Nasional",
+            "type": "green"
+        },
+        "2026-09-30": {
+            "label": "Hari Peringatan Pemberontakan G30S/PKI",
+            "type": "green"
+        },
+        "2026-10-02": {
+            "label": "Hari Batik Nasional",
+            "type": "green"
+        },
+        "2026-10-28": {
+            "label": "Hari Sumpah Pemuda",
+            "type": "red"
+        },
+        "2026-11-10": {
+            "label": "Hari Pahlawan",
+            "type": "green"
+        },
+        "2026-11-12": {
+            "label": "Hari Kesehatan Nasional",
+            "type": "green"
+        },
+        "2026-11-21": {
+            "label": "Hari Pohon Sedunia",
+            "type": "red"
+        },
+        "2026-11-25": {
+            "label": "Hari Guru Nasional (PGRI)",
+            "type": "green"
+        },
+        "2026-01-10": {
+            "label": "Hari Gerakan Satu Juta Pohon & Lingkungan Hidup Indonesia",
+            "type": "red"
+        },
+        "2026-02-21": {
+            "label": "Hari Peduli Sampah Nasional",
+            "type": "red"
+        },
+        "2026-04-21": {
+            "label": "Hari Kartini",
+            "type": "green"
+        },
+        "2026-04-06": {
+            "label": "Hari Nelayan Indonesia",
             "type": "green"
         }
     }
