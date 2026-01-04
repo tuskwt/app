@@ -14,6 +14,7 @@ setInterval(updateClock, 1000);
 updateClock();
 
 // --- State ---
+let isInitialLoad = true;
 // Load last viewed teacher from localStorage, fallback to first teacher
 const STORAGE_KEY = 'jadwal_lastTeacherId';
 let currentTeacherId = localStorage.getItem(STORAGE_KEY) || teachers[0]?.id || null;
@@ -221,8 +222,10 @@ function renderSchedule(autoScroll = true) {
     if (!teacher) return;
 
     const container = document.getElementById('schedule-view');
-    // Set min-height to prevent scroll jump when clearing content
-    container.style.minHeight = container.offsetHeight + 'px';
+    // Set min-height to prevent scroll jump when clearing content, only if it has height
+    if (container.offsetHeight > 0) {
+        container.style.minHeight = container.offsetHeight + 'px';
+    }
     container.innerHTML = '';
 
     const tabsContainer = document.getElementById('day-tabs');
@@ -417,6 +420,7 @@ function renderSchedule(autoScroll = true) {
 
     // Reset min-height after rendering
     container.style.minHeight = '';
+    isInitialLoad = false;
 }
 
 // --- Helper: Switch Active Day ---
@@ -436,7 +440,7 @@ function switchDay(day, autoScroll = true) {
     if (dayCard) {
         document.querySelectorAll('.day-column').forEach(d => d.classList.remove('mobile-active'));
         dayCard.classList.add('mobile-active');
-        if (autoScroll) {
+        if (autoScroll && !isInitialLoad) {
             dayCard.scrollIntoView({ block: 'nearest', inline: 'center' });
         }
     }
