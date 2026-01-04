@@ -266,7 +266,12 @@ function renderSchedule() {
 
             if (slot.period === "Rest") {
                 item.classList.add('item-rest');
-                contentCol.innerHTML = `<div class="event-title">☕ ${slot.label || 'Istirahat'}</div>`;
+                contentCol.innerHTML = `
+                    <div class="class-header">
+                        <span class="period-badge">☕</span>
+                        <span class="rest-title">${slot.label || 'Istirahat'}</span>
+                    </div>
+                `;
             } else {
                 const classInfo = teacherClasses.find(c => c.periods.includes(slot.period));
                 const periodBadge = `<span class="period-badge">${slot.period}</span>`;

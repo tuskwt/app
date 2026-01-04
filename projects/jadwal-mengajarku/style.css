@@ -406,12 +406,19 @@ body {
 .item-rest {
     background: #fffbeb;
     border-color: #fcd34d;
-    border-left: 4px solid #f59e0b;
+    border-left: 5px solid #f59e0b;
 }
 
-.item-rest .event-title {
+.item-rest .period-badge {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.rest-title {
     color: #b45309;
     font-weight: 700;
+    font-size: 1.1rem;
+    font-style: italic;
 }
 
 .item-class {
