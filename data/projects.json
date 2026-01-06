@@ -12,12 +12,5 @@
     "path": "projects/kalenderku/index.html",
     "icon": "calendar_month",
     "gradient": "icon-grad-2"
-  },
-  {
-    "id": "daftar---kode-guru-2846",
-    "name": "Daftar & Kode Guru",
-    "path": "projects/guruku/index.html",
-    "icon": "list",
-    "gradient": "icon-grad-5"
   }
 ]
