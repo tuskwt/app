@@ -721,6 +721,110 @@ const appData = {
                 ],
                 "Jumat": []
             }
+        },
+        {
+            "id": "1768053143842",
+            "name": "Ca²",
+            "code": "AI",
+            "schedule": {
+                "Senin": [
+                    {
+                        "periods": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "class": "XII TSM.2 (Kode: AI1)"
+                    },
+                    {
+                        "periods": [
+                            8,
+                            9,
+                            10,
+                            11
+                        ],
+                        "class": "XI TP (Kode: AI2)"
+                    }
+                ],
+                "Selasa": [
+                    {
+                        "periods": [
+                            7,
+                            8,
+                            9,
+                            10
+                        ],
+                        "class": "X TSM.1"
+                    },
+                    {
+                        "periods": [
+                            1,
+                            2,
+                            3
+                        ],
+                        "class": "XII TSM.3 (Kode: AI1)"
+                    }
+                ],
+                "Rabu": [
+                    {
+                        "periods": [
+                            1,
+                            2,
+                            3
+                        ],
+                        "class": "XII TSM.1 (Kode: AI1)"
+                    },
+                    {
+                        "periods": [
+                            7,
+                            8,
+                            9,
+                            10
+                        ],
+                        "class": "XII TP (Kode: AI2)"
+                    }
+                ],
+                "Kamis": [
+                    {
+                        "periods": [
+                            7,
+                            8,
+                            9,
+                            10
+                        ],
+                        "class": "X TP"
+                    },
+                    {
+                        "periods": [
+                            1,
+                            2,
+                            3,
+                            4
+                        ],
+                        "class": "X TKR"
+                    }
+                ],
+                "Jumat": [
+                    {
+                        "periods": [
+                            2,
+                            3,
+                            4,
+                            5
+                        ],
+                        "class": "X TSM.3"
+                    },
+                    {
+                        "periods": [
+                            6,
+                            7,
+                            8,
+                            9
+                        ],
+                        "class": "X TSM.2"
+                    }
+                ]
+            }
         }
     ]
 };
