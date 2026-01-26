@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super PDF by Chapteria</title>
+
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Libraries PDF & Utility -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+
+        .drag-ghost {
+            opacity: 0.4;
+            background: #e2e8f0;
+            border: 2px dashed #4a5568;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        .break-words {
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+        }
+    </style>
+    <script>
+        // Setup PDF.js Worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'assets/js/pdf.worker.min.js';
+    </script>
+</head>
+
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50 border-b border-slate-200">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="bg-blue-600 text-white p-2 rounded-xl shadow-lg shadow-blue-600/20">
+                    <i data-lucide="file-stack" class="h-6 w-6"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-slate-900 tracking-tight leading-tight">Super PDF</h1>
+                    <p class="text-xs text-slate-500 font-medium">by Chapteria</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-5xl mx-auto w-full px-4 py-6">
+
+        <!-- Tabs Navigation -->
+        <div class="grid grid-cols-3 gap-2 mb-6 bg-white p-1.5 rounded-2xl shadow-sm border border-slate-200">
+            <button onclick="switchTab('img2pdf')" id="btn-img2pdf"
+                class="tab-btn group flex flex-col sm:flex-row items-center justify-center gap-2 py-3 px-2 rounded-xl font-medium transition-all">
+                <i data-lucide="image-plus" class="w-5 h-5 transition-transform group-active:scale-90"></i>
+                <span class="text-xs sm:text-sm text-center">Image to PDF</span>
+            </button>
+            <button onclick="switchTab('pdf2img')" id="btn-pdf2img"
+                class="tab-btn group flex flex-col sm:flex-row items-center justify-center gap-2 py-3 px-2 rounded-xl font-medium transition-all">
+                <i data-lucide="image" class="w-5 h-5 transition-transform group-active:scale-90"></i>
+                <span class="text-xs sm:text-sm text-center">PDF to Image</span>
+            </button>
+            <button onclick="switchTab('combine')" id="btn-combine"
+                class="tab-btn group flex flex-col sm:flex-row items-center justify-center gap-2 py-3 px-2 rounded-xl font-medium transition-all">
+                <i data-lucide="files" class="w-5 h-5 transition-transform group-active:scale-90"></i>
+                <span class="text-xs sm:text-sm text-center">Combine PDF</span>
+            </button>
+        </div>
+
+        <!-- STATUS MESSAGE -->
+        <div id="status-message" class="hidden mb-6 p-4 rounded-xl shadow-sm border-l-4 text-sm"></div>
+
+        <!-- SECTION 1: IMAGE TO PDF -->
+        <div id="tab-content-img2pdf" class="space-y-6 animate-fade-in">
+            <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div class="mb-4">
+                    <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <div class="p-1.5 bg-blue-100 rounded-lg"><i data-lucide="images"
+                                class="text-blue-600 w-5 h-5"></i></div>
+                        Konversi Gambar ke PDF
+                    </h2>
+                    <p class="text-sm text-slate-500 mt-1">Pilih banyak gambar. Hasil PDF akan mengikuti ukuran asli
+                        gambar (Full Size).</p>
+                </div>
+
+                <!-- INPUT AREA -->
+                <div
+                    class="border-2 border-dashed border-blue-200 bg-blue-50/30 rounded-xl p-6 sm:p-8 text-center hover:bg-blue-50 hover:border-blue-400 transition-all cursor-pointer relative group">
+                    <input type="file" id="img-input" multiple accept="image/png, image/jpeg, image/jpg"
+                        class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                        onchange="handleImageSelect(event)">
+                    <div
+                        class="flex flex-col items-center gap-3 pointer-events-none group-hover:scale-105 transition-transform">
+                        <div class="bg-white p-3 rounded-full shadow-sm text-blue-600 ring-4 ring-blue-50"><i
+                                data-lucide="upload-cloud" class="w-8 h-8"></i></div>
+                        <div>
+                            <p class="font-bold text-slate-700 text-base sm:text-lg">Pilih Gambar (Multi-Select)</p>
+                            <p class="text-xs sm:text-sm text-slate-400 mt-1">Klik untuk membuka galeri</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    class="mt-3 flex items-start gap-2 text-xs text-slate-500 bg-slate-50 p-2 rounded-lg border border-slate-100">
+                    <i data-lucide="info" class="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5"></i>
+                    <span>
+                        <strong>Tips HP:</strong> Tekan & Tahan satu gambar untuk memilih banyak. <br>
+                        <strong>Tips PC:</strong> Tahan tombol Ctrl sambil klik gambar.
+                    </span>
+                </div>
+
+                <!-- Image List Area -->
+                <div id="img-list-container" class="mt-8 hidden">
+                    <div class="flex justify-between items-end mb-3 border-b border-slate-100 pb-2">
+                        <div>
+                            <h3 class="text-sm font-bold text-slate-800">Daftar Gambar</h3>
+                            <p class="text-xs text-slate-400"><span id="img-count">0</span> file dipilih</p>
+                        </div>
+                        <button onclick="clearImages()"
+                            class="text-red-500 text-xs font-semibold hover:bg-red-50 px-3 py-1.5 rounded-lg transition-colors">Hapus
+                            Semua</button>
+                    </div>
+
+                    <ul id="img-list" class="grid grid-cols-1 gap-3 mb-6 max-h-[500px] overflow-y-auto pr-1">
+                        <!-- List items injected here -->
+                    </ul>
+
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Mode
+                                Output</label>
+                            <select id="img-batch-mode" onchange="toggleImgFilename()"
+                                class="w-full p-3 border border-slate-200 rounded-xl bg-white text-sm focus:ring-2 focus:ring-blue-500 outline-none shadow-sm">
+                                <option value="merge">Gabung Semua jadi 1 File PDF (Berurutan)</option>
+                                <option value="individual">Download PDF Terpisah-pisah (Batch)</option>
+                            </select>
+                        </div>
+
+                        <div id="img-filename-container">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Nama
+                                File (Opsional)</label>
+                            <div class="flex items-center gap-2">
+                                <input type="text" id="img-output-name" placeholder="super-pdf-images"
+                                    class="flex-grow p-3 border border-slate-200 rounded-xl bg-white text-sm focus:ring-2 focus:ring-blue-500 outline-none shadow-sm"
+                                    onkeydown="return /[a-zA-Z0-9-_ ]/i.test(event.key)">
+                                <span
+                                    class="text-slate-500 text-sm font-bold bg-slate-100 px-3 py-3 rounded-xl border border-slate-200">.pdf</span>
+                            </div>
+                        </div>
+                        <button onclick="processImageToPdf()"
+                            class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3.5 rounded-xl font-bold shadow-lg shadow-blue-600/20 flex justify-center items-center gap-2 transition-all active:scale-95">
+                            <i data-lucide="file-check" class="w-5 h-5"></i> Proses & Download PDF
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 2: PDF TO IMAGE -->
+        <div id="tab-content-pdf2img" class="hidden space-y-6 animate-fade-in">
+            <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div class="mb-4">
+                    <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <div class="p-1.5 bg-green-100 rounded-lg"><i data-lucide="file-image"
+                                class="text-green-600 w-5 h-5"></i></div>
+                        Ekstrak PDF ke Gambar
+                    </h2>
+                    <p class="text-sm text-slate-500 mt-1">Ubah halaman PDF menjadi file gambar (JPEG).</p>
+                </div>
+
+                <div
+                    class="border-2 border-dashed border-green-200 bg-green-50/30 rounded-xl p-6 sm:p-8 text-center hover:bg-green-50 hover:border-green-400 transition-colors cursor-pointer relative group">
+                    <input type="file" id="pdf-extract-input" accept="application/pdf"
+                        class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                        onchange="handlePdfExtractSelect(event)">
+                    <div
+                        class="flex flex-col items-center gap-3 pointer-events-none group-hover:scale-105 transition-transform">
+                        <div class="bg-white p-3 rounded-full shadow-sm text-green-600 ring-4 ring-green-50"><i
+                                data-lucide="file-search" class="w-8 h-8"></i></div>
+                        <div>
+                            <p class="font-bold text-slate-700 text-base sm:text-lg">Pilih File PDF</p>
+                            <p class="text-xs sm:text-sm text-slate-400 mt-1">Klik untuk memuat</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="pdf-preview-area" class="hidden mt-8">
+                    <div
+                        class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 sticky top-0 z-10 bg-white/95 backdrop-blur py-3 border-b border-slate-100">
+                        <div class="overflow-hidden w-full sm:w-auto">
+                            <h3 class="font-bold text-slate-800 truncate" id="pdf-name-display">Filename.pdf</h3>
+                            <p class="text-xs text-slate-500 font-medium" id="pdf-page-count">Loading...</p>
+                        </div>
+                        <button onclick="downloadAllImages()"
+                            class="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-green-600/20 flex justify-center items-center gap-2 transition-all active:scale-95">
+                            <i data-lucide="archive" class="w-4 h-4"></i> Download Semua (ZIP)
+                        </button>
+                    </div>
+
+                    <div id="pdf-pages-grid"
+                        class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-h-[600px] overflow-y-auto p-2 border rounded-xl bg-slate-50/50">
+                        <!-- Canvases injected here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 3: COMBINE PDF -->
+        <div id="tab-content-combine" class="hidden space-y-6 animate-fade-in">
+            <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div class="mb-4">
+                    <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <div class="p-1.5 bg-purple-100 rounded-lg"><i data-lucide="layers"
+                                class="text-purple-600 w-5 h-5"></i></div>
+                        Gabung PDF (Combine)
+                    </h2>
+                    <p class="text-sm text-slate-500 mt-1">Pilih banyak file PDF, urutkan halamannya, lalu satukan.</p>
+                </div>
+
+                <!-- INPUT AREA -->
+                <div
+                    class="border-2 border-dashed border-purple-200 bg-purple-50/30 rounded-xl p-6 sm:p-8 text-center hover:bg-purple-50 hover:border-purple-400 transition-colors cursor-pointer relative group">
+                    <input type="file" id="combine-input" multiple accept="application/pdf"
+                        class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                        onchange="handleCombineSelect(event)">
+                    <div
+                        class="flex flex-col items-center gap-3 pointer-events-none group-hover:scale-105 transition-transform">
+                        <div class="bg-white p-3 rounded-full shadow-sm text-purple-600 ring-4 ring-purple-50"><i
+                                data-lucide="copy-plus" class="w-8 h-8"></i></div>
+                        <div>
+                            <p class="font-bold text-slate-700 text-base sm:text-lg">Pilih Banyak PDF</p>
+                            <p class="text-xs sm:text-sm text-slate-400 mt-1">Klik di sini untuk membuka file manager
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    class="mt-3 flex items-start gap-2 text-xs text-slate-500 bg-slate-50 p-2 rounded-lg border border-slate-100">
+                    <i data-lucide="info" class="w-4 h-4 text-purple-500 flex-shrink-0 mt-0.5"></i>
+                    <span>
+                        <strong>Tips HP:</strong> Tekan & Tahan satu file PDF untuk memilih banyak sekaligus. <br>
+                        <strong>Tips PC:</strong> Tahan Ctrl + Klik file.
+                    </span>
+                </div>
+
+                <div id="combine-list-container" class="mt-8 hidden">
+                    <div class="flex justify-between items-end mb-3 border-b border-slate-100 pb-2">
+                        <div>
+                            <h3 class="text-sm font-bold text-slate-800">Urutan Penggabungan</h3>
+                            <p class="text-xs text-slate-400"><span id="combine-count">0</span> file akan digabung</p>
+                        </div>
+                        <button onclick="clearCombine()"
+                            class="text-red-500 text-xs font-semibold hover:bg-red-50 px-3 py-1.5 rounded-lg transition-colors">Reset</button>
+                    </div>
+
+                    <div
+                        class="bg-blue-50 text-blue-700 text-xs p-3 rounded-lg mb-4 flex items-center gap-2 border border-blue-100">
+                        <i data-lucide="arrow-up-down" class="w-4 h-4 flex-shrink-0"></i>
+                        <span>Geser (Drag) kotak untuk ubah urutan, atau pakai tombol panah.</span>
+                    </div>
+
+                    <ul id="combine-list" class="space-y-2 mb-6 max-h-[500px] overflow-y-auto pr-1">
+                        <!-- PDF items injected here -->
+                    </ul>
+
+                    <button onclick="processCombinePdf()"
+                        class="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 rounded-xl font-bold text-lg shadow-lg shadow-purple-600/20 flex justify-center items-center gap-3 transition-all active:scale-95">
+                        <i data-lucide="merge" class="w-6 h-6"></i> Gabungkan PDF Sekarang
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="mt-auto py-6 border-t border-slate-100 bg-white">
+        <div class="max-w-5xl mx-auto px-4 text-center">
+            <p class="text-slate-500 text-sm font-medium">Super PDF by Chapteria</p>
+            <p class="text-slate-400 text-xs mt-1">Semua proses berjalan di browser Anda. File tidak diupload ke server.
+            </p>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // STATE MANAGEMENT
+        let imgFiles = [];
+        let combineFiles = [];
+        let pdfExtractDoc = null;
+
+        // --- TAB NAVIGATION ---
+        function switchTab(tabId) {
+            document.querySelectorAll('[id^="tab-content-"]').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tab-content-${tabId}`).classList.remove('hidden');
+
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.className = "tab-btn flex flex-col sm:flex-row items-center justify-center gap-2 py-3 px-2 rounded-xl font-medium text-slate-500 hover:bg-slate-50 transition-all cursor-pointer border border-transparent";
+            });
+
+            const activeBtn = document.getElementById(`btn-${tabId}`);
+
+            if (tabId === 'img2pdf') {
+                activeBtn.className = "tab-btn flex flex-col sm:flex-row items-center justify-center gap-2 py-3 px-2 rounded-xl font-bold transition-all bg-blue-50 text-blue-600 border border-blue-100 shadow-sm";
+            } else if (tabId === 'pdf2img') {
+                activeBtn.className = "tab-btn flex flex-col sm:flex-row items-center justify-center gap-2 py-3 px-2 rounded-xl font-bold transition-all bg-green-50 text-green-600 border border-green-100 shadow-sm";
+            } else if (tabId === 'combine') {
+                activeBtn.className = "tab-btn flex flex-col sm:flex-row items-center justify-center gap-2 py-3 px-2 rounded-xl font-bold transition-all bg-purple-50 text-purple-600 border border-purple-100 shadow-sm";
+            }
+
+            hideStatus();
+        }
+
+        function toggleImgFilename() {
+            const mode = document.getElementById('img-batch-mode').value;
+            const container = document.getElementById('img-filename-container');
+            if (mode === 'merge') {
+                container.classList.remove('hidden');
+            } else {
+                container.classList.add('hidden');
+            }
+        }
+
+        // --- UTILITY UI FUNCTIONS ---
+        function showStatus(msg, type = 'info') {
+            const el = document.getElementById('status-message');
+
+            let bgClass = 'bg-blue-50 border-blue-500 text-blue-700';
+            let iconName = 'info';
+
+            if (type === 'error') {
+                bgClass = 'bg-red-50 border-red-500 text-red-700';
+                iconName = 'alert-circle';
+            } else if (type === 'success') {
+                bgClass = 'bg-green-50 border-green-500 text-green-700';
+                iconName = 'check-circle-2';
+            } else if (type === 'loading') {
+                bgClass = 'bg-slate-50 border-blue-400 text-slate-700';
+            }
+
+            el.className = `mb-6 p-4 rounded-xl shadow-sm border-l-4 flex items-center gap-3 ${bgClass} animate-pulse-once`;
+
+            el.innerHTML = type === 'loading'
+                ? `<div class="loader"></div> <span class="font-medium">${msg}</span>`
+                : `<i data-lucide="${iconName}" class="w-5 h-5 flex-shrink-0"></i> <span class="font-medium">${msg}</span>`;
+
+            el.classList.remove('hidden');
+            lucide.createIcons();
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function hideStatus() {
+            document.getElementById('status-message').classList.add('hidden');
+        }
+
+        // --- FEATURE 1: IMAGE TO PDF (UPDATED NO MARGIN) ---
+
+        function handleImageSelect(e) {
+            const files = Array.from(e.target.files);
+            if (!files.length) return;
+
+            const promises = files.map(file => {
+                return new Promise(resolve => {
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                        resolve({
+                            id: Date.now() + Math.random().toString(36).substr(2, 9),
+                            file: file,
+                            preview: ev.target.result
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                });
+            });
+
+            Promise.all(promises).then(results => {
+                imgFiles = [...imgFiles, ...results];
+                renderImageList();
+                e.target.value = '';
+            });
+        }
+
+        function renderImageList() {
+            const container = document.getElementById('img-list-container');
+            const list = document.getElementById('img-list');
+            const count = document.getElementById('img-count');
+
+            if (imgFiles.length === 0) {
+                container.classList.add('hidden');
+                return;
+            }
+
+            container.classList.remove('hidden');
+            count.innerText = imgFiles.length;
+            list.innerHTML = '';
+
+            imgFiles.forEach((item, index) => {
+                const li = document.createElement('li');
+                li.className = "bg-white border border-slate-200 rounded-xl p-2 sm:p-3 flex items-center gap-3 shadow-sm cursor-move hover:border-blue-400 hover:shadow-md transition-all group";
+                li.setAttribute('data-id', item.id);
+                li.innerHTML = `
+                    <div class="relative h-16 w-16 sm:h-20 sm:w-20 bg-slate-100 rounded-lg overflow-hidden flex-shrink-0 border border-slate-200 group-hover:border-blue-300">
+                        <div class="absolute top-0 left-0 bg-blue-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-br-lg z-10 shadow-sm">#${index + 1}</div>
+                        <img src="${item.preview}" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors"></div>
+                    </div>
+                    <div class="flex-grow min-w-0 flex flex-col justify-center py-1">
+                        <p class="text-xs sm:text-sm font-bold text-slate-800 mb-1 break-words leading-tight">${item.file.name}</p>
+                        <p class="text-[10px] sm:text-xs text-slate-400 font-medium bg-slate-100 inline-block px-2 py-0.5 rounded-full w-fit flex-shrink-0">${(item.file.size / 1024).toFixed(1)} KB</p>
+                    </div>
+                    <div class="flex flex-col gap-1 border-l pl-2 border-slate-100">
+                        <button onclick="moveImg('${item.id}', -1)" class="p-1.5 hover:bg-blue-50 hover:text-blue-600 rounded-lg text-slate-400 transition-colors" title="Geser Atas">
+                            <i data-lucide="chevron-up" class="w-4 h-4"></i>
+                        </button>
+                        <button onclick="moveImg('${item.id}', 1)" class="p-1.5 hover:bg-blue-50 hover:text-blue-600 rounded-lg text-slate-400 transition-colors" title="Geser Bawah">
+                            <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    <button onclick="removeImg('${item.id}')" class="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all ml-1">
+                        <i data-lucide="trash-2" class="w-5 h-5"></i>
+                    </button>
+                `;
+                list.appendChild(li);
+            });
+            lucide.createIcons();
+
+            if (!list.sortable) {
+                list.sortable = new Sortable(list, {
+                    animation: 150,
+                    ghostClass: 'drag-ghost',
+                    onEnd: function (evt) {
+                        const newOrder = [];
+                        list.querySelectorAll('li').forEach(el => {
+                            const id = el.getAttribute('data-id');
+                            newOrder.push(imgFiles.find(f => f.id === id));
+                        });
+                        imgFiles = newOrder;
+                    }
+                });
+            }
+        }
+
+        function moveImg(id, direction) {
+            const index = imgFiles.findIndex(f => f.id === id);
+            if (index < 0) return;
+
+            const newIndex = index + direction;
+            if (newIndex >= 0 && newIndex < imgFiles.length) {
+                const temp = imgFiles[index];
+                imgFiles[index] = imgFiles[newIndex];
+                imgFiles[newIndex] = temp;
+                renderImageList();
+            }
+        }
+
+        function removeImg(id) {
+            imgFiles = imgFiles.filter(f => f.id !== id);
+            renderImageList();
+        }
+
+        function clearImages() {
+            imgFiles = [];
+            renderImageList();
+        }
+
+        async function processImageToPdf() {
+            if (imgFiles.length === 0) return showStatus("Pilih gambar terlebih dahulu", "error");
+
+            const mode = document.getElementById('img-batch-mode').value;
+            const { jsPDF } = window.jspdf;
+
+            showStatus("Sedang memproses PDF...", "loading");
+
+            setTimeout(async () => {
+                try {
+                    if (mode === 'merge') {
+                        let doc = null;
+
+                        for (let i = 0; i < imgFiles.length; i++) {
+                            const imgData = imgFiles[i].preview;
+                            const img = new Image();
+                            img.src = imgData;
+                            await new Promise(r => img.onload = r);
+
+                            // Get exact pixel dimensions
+                            const width = img.naturalWidth;
+                            const height = img.naturalHeight;
+                            const orientation = width > height ? 'l' : 'p';
+
+                            if (i === 0) {
+                                // First page: initialize with exact image dimensions using 'px' unit
+                                doc = new jsPDF({
+                                    orientation: orientation,
+                                    unit: 'px',
+                                    format: [width, height]
+                                });
+                                doc.addImage(imgData, 'JPEG', 0, 0, width, height);
+                            } else {
+                                // Subsequent pages: add page with exact dimensions
+                                doc.addPage([width, height], orientation);
+                                doc.addImage(imgData, 'JPEG', 0, 0, width, height);
+                            }
+                        }
+
+                        let filenameUser = document.getElementById('img-output-name').value.trim();
+                        if (!filenameUser) filenameUser = "super-pdf-images";
+                        // Ensure it ends with .pdf
+                        if (!filenameUser.toLowerCase().endsWith('.pdf')) filenameUser += ".pdf";
+
+                        doc.save(filenameUser);
+                    } else {
+                        const zip = new JSZip();
+                        for (let i = 0; i < imgFiles.length; i++) {
+                            const imgData = imgFiles[i].preview;
+                            const img = new Image();
+                            img.src = imgData;
+                            await new Promise(r => img.onload = r);
+
+                            const width = img.naturalWidth;
+                            const height = img.naturalHeight;
+                            const orientation = width > height ? 'l' : 'p';
+
+                            // Individual file: exact dimensions
+                            const doc = new jsPDF({
+                                orientation: orientation,
+                                unit: 'px',
+                                format: [width, height]
+                            });
+
+                            doc.addImage(imgData, 'JPEG', 0, 0, width, height);
+
+                            let cleanName = imgFiles[i].file.name.replace(/\.[^/.]+$/, "");
+                            zip.file(`${cleanName}.pdf`, doc.output('blob'));
+                        }
+                        const content = await zip.generateAsync({ type: "blob" });
+                        saveAs(content, "super-pdf-batch.zip");
+                    }
+                    showStatus("Berhasil! File Anda sedang diunduh.", "success");
+                } catch (err) {
+                    console.error(err);
+                    showStatus("Gagal memproses: " + err.message, "error");
+                }
+            }, 100);
+        }
+
+        // --- FEATURE 2: PDF TO IMAGE ---
+
+        async function handlePdfExtractSelect(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            if (file.type !== 'application/pdf') return showStatus("File harus format PDF", "error");
+
+            showStatus("Membaca file PDF...", "loading");
+            document.getElementById('pdf-preview-area').classList.remove('hidden');
+            document.getElementById('pdf-name-display').innerText = file.name;
+            document.getElementById('pdf-pages-grid').innerHTML = '';
+
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                pdfExtractDoc = await pdfjsLib.getDocument(arrayBuffer).promise;
+
+                document.getElementById('pdf-page-count').innerText = `${pdfExtractDoc.numPages} Halaman`;
+
+                renderPdfThumbnails(pdfExtractDoc);
+                showStatus("PDF dimuat. Silakan download halaman.", "success");
+            } catch (err) {
+                console.error(err);
+                showStatus("Gagal membaca PDF. File mungkin rusak/password.", "error");
+                document.getElementById('pdf-preview-area').classList.add('hidden');
+            }
+            e.target.value = '';
+        }
+
+        async function renderPdfThumbnails(pdf) {
+            const grid = document.getElementById('pdf-pages-grid');
+            const maxPages = Math.min(pdf.numPages, 50);
+            if (pdf.numPages > 50) showStatus(`Menampilkan 50 halaman pertama dari ${pdf.numPages}.`, "info");
+
+            for (let i = 1; i <= maxPages; i++) {
+                const div = document.createElement('div');
+                div.className = "bg-white border rounded-lg p-2 shadow-sm flex flex-col gap-2 hover:shadow-md transition-shadow";
+
+                const canvas = document.createElement('canvas');
+                canvas.className = "w-full h-auto border border-slate-100 rounded bg-slate-200";
+
+                pdf.getPage(i).then(page => {
+                    const viewport = page.getViewport({ scale: 0.3 });
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+
+                    page.render({
+                        canvasContext: canvas.getContext('2d'),
+                        viewport: viewport
+                    });
+                });
+
+                const btn = document.createElement('button');
+                btn.className = "w-full bg-white border border-slate-200 hover:bg-green-50 hover:text-green-600 text-slate-600 text-xs py-2 rounded font-medium transition-colors flex items-center justify-center gap-1";
+                btn.innerHTML = `<i data-lucide="download" class="w-3 h-3"></i> Hal ${i}`;
+                btn.onclick = () => downloadSinglePage(i);
+
+                div.appendChild(canvas);
+                div.appendChild(btn);
+                grid.appendChild(div);
+            }
+            lucide.createIcons();
+        }
+
+        async function downloadSinglePage(pageNum) {
+            if (!pdfExtractDoc) return;
+            try {
+                const page = await pdfExtractDoc.getPage(pageNum);
+                const scale = 2.0;
+                const viewport = page.getViewport({ scale });
+
+                const canvas = document.createElement('canvas');
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+
+                await page.render({
+                    canvasContext: canvas.getContext('2d'),
+                    viewport: viewport
+                }).promise;
+
+                canvas.toBlob(blob => {
+                    saveAs(blob, `halaman-${pageNum}.jpg`);
+                }, 'image/jpeg', 0.9);
+
+            } catch (e) {
+                alert("Gagal mengunduh halaman.");
+            }
+        }
+
+        async function downloadAllImages() {
+            if (!pdfExtractDoc) return;
+            showStatus("Mengemas ZIP (Tunggu sebentar)...", "loading");
+
+            const zip = new JSZip();
+            const folder = zip.folder("images");
+
+            setTimeout(async () => {
+                try {
+                    for (let i = 1; i <= pdfExtractDoc.numPages; i++) {
+                        const page = await pdfExtractDoc.getPage(i);
+                        const scale = 2.0;
+                        const viewport = page.getViewport({ scale });
+
+                        const canvas = document.createElement('canvas');
+                        canvas.width = viewport.width;
+                        canvas.height = viewport.height;
+
+                        await page.render({
+                            canvasContext: canvas.getContext('2d'),
+                            viewport: viewport
+                        }).promise;
+
+                        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.9));
+                        folder.file(`halaman-${i}.jpg`, blob);
+                    }
+
+                    const content = await zip.generateAsync({ type: "blob" });
+                    saveAs(content, "semua-halaman.zip");
+                    showStatus("ZIP Siap!", "success");
+                } catch (e) {
+                    console.error(e);
+                    showStatus("Gagal membuat ZIP.", "error");
+                }
+            }, 100);
+        }
+
+        // --- FEATURE 3: COMBINE PDF ---
+
+        function handleCombineSelect(e) {
+            const files = Array.from(e.target.files);
+            if (!files.length) return;
+
+            const newFiles = files.map(file => ({
+                id: Date.now() + Math.random().toString(36).substr(2, 9),
+                file: file,
+                name: file.name
+            }));
+
+            combineFiles = [...combineFiles, ...newFiles];
+            renderCombineList();
+            e.target.value = '';
+        }
+
+        function renderCombineList() {
+            const container = document.getElementById('combine-list-container');
+            const list = document.getElementById('combine-list');
+            const count = document.getElementById('combine-count');
+
+            if (combineFiles.length === 0) {
+                container.classList.add('hidden');
+                return;
+            }
+
+            container.classList.remove('hidden');
+            count.innerText = combineFiles.length;
+            list.innerHTML = '';
+
+            combineFiles.forEach((item, index) => {
+                const li = document.createElement('li');
+                li.className = "bg-white border border-slate-200 rounded-lg p-3 flex items-center gap-3 shadow-sm cursor-move hover:border-purple-400 transition-all group";
+                li.setAttribute('data-id', item.id);
+                li.innerHTML = `
+                    <div class="bg-red-50 p-2 rounded-lg border border-red-100 flex-shrink-0">
+                        <i data-lucide="file-text" class="text-red-500 w-5 h-5"></i>
+                    </div>
+                    <div class="flex-shrink-0">
+                        <span class="bg-slate-800 text-white text-[10px] px-2 py-1 rounded-lg font-bold min-w-[1.8rem] text-center block shadow-sm">${index + 1}</span>
+                    </div>
+                    <div class="flex-grow min-w-0">
+                        <p class="text-xs sm:text-sm font-semibold text-slate-800 w-full break-words leading-tight mb-0.5">${item.name}</p>
+                        <div class="flex items-center gap-2 text-xs text-slate-400">
+                            <span>${(item.file.size / 1024 / 1024).toFixed(2)} MB</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1 border-l pl-2 border-slate-100">
+                         <button onclick="movePdf('${item.id}', -1)" class="p-2 hover:bg-purple-50 hover:text-purple-600 rounded-lg text-slate-400 transition-colors" title="Ke Atas">
+                            <i data-lucide="arrow-up" class="w-4 h-4"></i>
+                        </button>
+                        <button onclick="movePdf('${item.id}', 1)" class="p-2 hover:bg-purple-50 hover:text-purple-600 rounded-lg text-slate-400 transition-colors" title="Ke Bawah">
+                            <i data-lucide="arrow-down" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    <button onclick="removePdf('${item.id}')" class="p-2 text-slate-300 hover:text-red-600 hover:bg-red-50 rounded-lg ml-1 transition-colors">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                `;
+                list.appendChild(li);
+            });
+            lucide.createIcons();
+
+            if (!list.sortable) {
+                list.sortable = new Sortable(list, {
+                    animation: 150,
+                    ghostClass: 'drag-ghost',
+                    onEnd: function (evt) {
+                        const newOrder = [];
+                        list.querySelectorAll('li').forEach(el => {
+                            const id = el.getAttribute('data-id');
+                            newOrder.push(combineFiles.find(f => f.id === id));
+                        });
+                        combineFiles = newOrder;
+                        renderCombineList();
+                    }
+                });
+            }
+        }
+
+        function movePdf(id, direction) {
+            const index = combineFiles.findIndex(f => f.id === id);
+            if (index < 0) return;
+
+            const newIndex = index + direction;
+            if (newIndex >= 0 && newIndex < combineFiles.length) {
+                const temp = combineFiles[index];
+                combineFiles[index] = combineFiles[newIndex];
+                combineFiles[newIndex] = temp;
+                renderCombineList();
+            }
+        }
+
+        function removePdf(id) {
+            combineFiles = combineFiles.filter(f => f.id !== id);
+            renderCombineList();
+        }
+
+        function clearCombine() {
+            combineFiles = [];
+            renderCombineList();
+        }
+
+        async function processCombinePdf() {
+            if (combineFiles.length === 0) return showStatus("Pilih PDF dulu", "error");
+
+            showStatus("Menggabungkan PDF...", "loading");
+            const { PDFDocument } = PDFLib;
+
+            setTimeout(async () => {
+                try {
+                    const mergedPdf = await PDFDocument.create();
+
+                    for (const item of combineFiles) {
+                        const arrayBuffer = await item.file.arrayBuffer();
+                        const pdf = await PDFDocument.load(arrayBuffer);
+                        const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+                        copiedPages.forEach((page) => mergedPdf.addPage(page));
+                    }
+
+                    const pdfBytes = await mergedPdf.save();
+                    const blob = new Blob([pdfBytes], { type: "application/pdf" });
+                    saveAs(blob, "dokumen-gabungan.pdf");
+                    showStatus("Selesai!", "success");
+                } catch (err) {
+                    console.error(err);
+                    showStatus("Gagal gabung PDF. Mungkin file terenkripsi.", "error");
+                }
+            }, 100);
+        }
+
+        // Init
+        switchTab('img2pdf');
+    </script>
+</body>
+
+</html>
