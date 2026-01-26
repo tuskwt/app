@@ -12,12 +12,5 @@
     "path": "projects/kalenderku/index.html",
     "icon": "calendar_month",
     "gradient": "icon-grad-2"
-  },
-  {
-    "id": "superpdf-6711",
-    "name": "SuperPDF",
-    "path": "projects/SuperPDF/index.html",
-    "icon": "description",
-    "gradient": "icon-grad-4"
   }
 ]
