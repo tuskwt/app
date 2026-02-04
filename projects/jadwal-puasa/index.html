@@ -264,16 +264,6 @@
             font-weight: 600;
             font-family: 'Courier New', monospace;
         }
-
-        .footer a[href*="chapteria"] {
-    color: #007bff !important; /* Mode terang */
-}
-
-@media (prefers-color-scheme: dark) {
-    .footer a[href*="chapteria"] {
-        color: #66b3ff !important; /* Mode gelap */
-    }
-}
     </style>
 </head>
 <body>
@@ -326,7 +316,7 @@
     </div>
 
     <div class="footer">
-        © 2025 Jadwal Imsakiyah Ramadhan by <a href="https://www.chapteria.com" target="_blank" rel="noopener">Chapteria</a>. Sumber: Kementerian Agama Kabupaten Sragen. 
+        © 2026 Jadwal Imsakiyah Ramadhan. Sumber: Kementerian Agama Kabupaten Sragen. 
     </div>
 </div>
 
@@ -377,14 +367,14 @@ function renderTable(data) {
     
     // Mendapatkan tanggal saat ini 
     const today = new Date();
-    const currentDateStr = `${today.getDate()} Maret 2025`;
+    const currentDateStr = `${today.getDate()} Maret 2026`;
     
     data.forEach((row, index) => {
         let tr = document.createElement("tr");
         
         // Cek apakah hari ini
         const dayNumber = formatDayNumber(row[0]);
-        if (dayNumber === today.getDate() && today.getMonth() === 2 && today.getFullYear() === 2025) {
+        if (dayNumber === today.getDate() && today.getMonth() === 2 && today.getFullYear() === 2026) {
             tr.classList.add("today");
         }
         
@@ -429,7 +419,7 @@ function updateNextPrayer() {
     // Cari data untuk hari ini 
     const todayData = jadwalData.find(row => {
         const dayNumber = formatDayNumber(row[0]);
-        return dayNumber === today && now.getMonth() === 2 && now.getFullYear() === 2025;
+        return dayNumber === today && now.getMonth() === 2 && now.getFullYear() === 2026;
     });
     
     if (!todayData) {
@@ -468,7 +458,7 @@ function updateNextPrayer() {
     if (!nextPrayer) {
         const tomorrowIndex = jadwalData.findIndex(row => {
             const dayNumber = formatDayNumber(row[0]);
-            return dayNumber === today && now.getMonth() === 2 && now.getFullYear() === 2025;
+            return dayNumber === today && now.getMonth() === 2 && now.getFullYear() === 2026;
         }) + 1;
         
         if (tomorrowIndex < jadwalData.length) {
