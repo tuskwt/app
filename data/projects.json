@@ -12,5 +12,12 @@
     "path": "projects/kalenderku/index.html",
     "icon": "calendar_month",
     "gradient": "icon-grad-2"
+  },
+  {
+    "id": "jadwal-puasa-2026-5440",
+    "name": "Jadwal Puasa 2026",
+    "path": "projects/jadwal-puasa/index.html",
+    "icon": "mosque",
+    "gradient": "icon-grad-5"
   }
 ]
