@@ -677,7 +677,7 @@ const appData = {
                 "Senin": [
                     {
                         "periods": [
-                            7
+                            8
                         ],
                         "class": "X TSM.2"
                     }
