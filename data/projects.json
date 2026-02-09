@@ -7,6 +7,13 @@
     "gradient": "icon-grad-1"
   },
   {
+    "id": "kode-guru-9884",
+    "name": "Kode Guru",
+    "path": "projects/kode-guru/index.html",
+    "icon": "group",
+    "gradient": "icon-grad-1"
+  },
+  {
     "id": "kalenderku",
     "name": "Kalender",
     "path": "projects/kalenderku/index.html",
