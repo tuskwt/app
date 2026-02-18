@@ -37,7 +37,7 @@
         }
 
         body {
-            font-family: Poppins;
+            font-family: 'Poppins', sans-serif;
             margin: 0;
             padding: 0;
             background-color: var(--background-color);
@@ -252,6 +252,7 @@
             background-color: rgba(255, 255, 255, 0.1);
             padding: 10px 5px;
             border-radius: 6px;
+            border: 1px solid transparent; /* Untuk menjaga layout saat border muncul */
         }
 
         .prayer-name {
@@ -276,7 +277,7 @@
 
     <div class="info-panel">
         <div id="today-info">
-            <span id="hijri-date"></span>
+            <span id="hijri-date">Menunggu tanggal...</span>
         </div>
         <div id="prayer-countdown" class="prayer-countdown">
             Memuat waktu shalat berikutnya...
@@ -354,37 +355,46 @@ const jadwalData = [
     ["Jumat, 20 Maret 2026", "04:15", "04:25", "11:47", "14:58", "17:50", "18:59"]
 ];
 
-// Fungsi untuk memformat nomor hari 
-function formatDayNumber(dateString) {
-    const day = parseInt(dateString.split(',')[1].trim().split(' ')[0]);
-    return day;
+const monthMap = {
+    "Januari": 0, "Februari": 1, "Maret": 2, "April": 3, "Mei": 4, "Juni": 5,
+    "Juli": 6, "Agustus": 7, "September": 8, "Oktober": 9, "November": 10, "Desember": 11
+};
+
+function parseDateRow(dateString) {
+    const parts = dateString.split(',')[1].trim().split(' '); 
+    const day = parseInt(parts[0]);
+    const monthIndex = monthMap[parts[1]];
+    const year = parseInt(parts[2]);
+    return new Date(year, monthIndex, day);
 }
 
-// Fungsi untuk mengisi tabel
+function isSameDate(date1, date2) {
+    return date1.getDate() === date2.getDate() &&
+           date1.getMonth() === date2.getMonth() &&
+           date1.getFullYear() === date2.getFullYear();
+}
+
 function renderTable(data) {
     const tbody = document.getElementById("jadwal-body");
     tbody.innerHTML = '';
     
-    // Mendapatkan tanggal saat ini 
-    const today = new Date();
-    const currentDateStr = `${today.getDate()} Maret 2026`;
+    // Gunakan tanggal simulasi jika user ingin melihat tampilan (Uncomment untuk test)
+    // const today = new Date(2026, 1, 19); 
+    const today = new Date(); 
     
     data.forEach((row, index) => {
         let tr = document.createElement("tr");
         
-        // Cek apakah hari ini
-        const dayNumber = formatDayNumber(row[0]);
-        if (dayNumber === today.getDate() && today.getMonth() === 2 && today.getFullYear() === 2026) {
+        const rowDate = parseDateRow(row[0]);
+        
+        if (isSameDate(today, rowDate)) {
             tr.classList.add("today");
         }
         
-        // Tambahkan kolom tanggal dengan nomor hari
         let tdDate = document.createElement("td");
-        const dateParts = row[0].split(',');
-        tdDate.innerHTML = `${dateParts[0]},${dateParts[1]}`;
+        tdDate.textContent = row[0];
         tr.appendChild(tdDate);
         
-        // Tambahkan kolom waktu shalat
         for (let i = 1; i < row.length; i++) {
             let td = document.createElement("td");
             td.textContent = row[i];
@@ -396,7 +406,6 @@ function renderTable(data) {
     });
 }
 
-// Fungsi untuk mencari tanggal
 function searchDate() {
     const searchText = document.getElementById("search-input").value.toLowerCase();
     if (!searchText) {
@@ -411,23 +420,32 @@ function searchDate() {
     renderTable(filteredData);
 }
 
-// Fungsi untuk menghitung waktu hingga shalat berikutnya
 function updateNextPrayer() {
-    const now = new Date();
-    const today = now.getDate();
+    // UNTUK TESTING/DEMO: Gunakan tanggal simulasi ini jika ingin melihat hasil "live"
+    // (Misal: 19 Februari 2026, jam 04:34 pagi)
+    // const now = new Date(2026, 1, 19, 4, 34, 0); 
     
-    // Cari data untuk hari ini 
-    const todayData = jadwalData.find(row => {
-        const dayNumber = formatDayNumber(row[0]);
-        return dayNumber === today && now.getMonth() === 2 && now.getFullYear() === 2026;
-    });
+    // UNTUK PRODUKSI: Gunakan waktu sistem
+    const now = new Date();
+
+    let todayData = null;
+
+    for (let i = 0; i < jadwalData.length; i++) {
+        const d = parseDateRow(jadwalData[i][0]);
+        if (isSameDate(now, d)) {
+            todayData = jadwalData[i];
+            break;
+        }
+    }
     
     if (!todayData) {
-        document.getElementById("prayer-countdown").textContent = "Di luar bulan Ramadhan";
+        document.getElementById("prayer-countdown").textContent = "Tanggal saat ini di luar jadwal Ramadhan 2026";
+        document.getElementById("hijri-date").textContent = "Menunggu Ramadhan 1447 H";
+        // Reset highlights
+        document.getElementById("today-times").innerHTML = '';
         return;
     }
     
-    // Konversi waktu shalat ke Date objects
     const prayers = [
         {name: "Imsak", time: todayData[1]},
         {name: "Subuh", time: todayData[2]},
@@ -437,15 +455,15 @@ function updateNextPrayer() {
         {name: "Isya", time: todayData[6]}
     ];
     
-    // Konversi waktu ke Date objects untuk perbandingan
+    // Buat array prayer dengan object Date lengkap
     const prayerTimes = prayers.map(prayer => {
         const [hours, minutes] = prayer.time.split(':').map(Number);
-        const prayerDate = new Date();
-        prayerDate.setHours(hours, minutes, 0, 0);
-        return {...prayer, date: prayerDate};
+        const pDate = new Date(now);
+        pDate.setHours(hours, minutes, 0, 0);
+        return {...prayer, date: pDate};
     });
     
-    // Cari waktu shalat berikutnya
+    // --- 1. CARI NEXT PRAYER (Untuk Countdown) ---
     let nextPrayer = null;
     for (const prayer of prayerTimes) {
         if (prayer.date > now) {
@@ -454,43 +472,41 @@ function updateNextPrayer() {
         }
     }
     
-    // Jika tidak ada waktu shalat berikutnya hari ini, gunakan waktu Imsak besok
     if (!nextPrayer) {
-        const tomorrowIndex = jadwalData.findIndex(row => {
-            const dayNumber = formatDayNumber(row[0]);
-            return dayNumber === today && now.getMonth() === 2 && now.getFullYear() === 2026;
-        }) + 1;
-        
-        if (tomorrowIndex < jadwalData.length) {
-            const tomorrowData = jadwalData[tomorrowIndex];
-            const [hours, minutes] = tomorrowData[1].split(':').map(Number); // Imsak
-            const tomorrowDate = new Date();
-            tomorrowDate.setDate(tomorrowDate.getDate() + 1);
-            tomorrowDate.setHours(hours, minutes, 0, 0);
-            nextPrayer = {name: "Imsak (besok)", time: tomorrowData[1], date: tomorrowDate};
+        // Cek hari esok untuk Imsak
+        const currentIndex = jadwalData.indexOf(todayData);
+        if (currentIndex + 1 < jadwalData.length) {
+            const tomorrowData = jadwalData[currentIndex + 1];
+            const tomorrowDate = parseDateRow(tomorrowData[0]);
+            const [hours, minutes] = tomorrowData[1].split(':').map(Number);
+            
+            const imsakTomorrow = new Date(tomorrowDate);
+            imsakTomorrow.setHours(hours, minutes, 0, 0);
+            
+            nextPrayer = {name: "Imsak", time: tomorrowData[1], date: imsakTomorrow}; 
         } else {
-            document.getElementById("prayer-countdown").textContent = "Ramadhan telah berakhir";
+            document.getElementById("prayer-countdown").textContent = "Ramadhan 2026 telah berakhir";
             return;
         }
     }
     
-    // Hitung selisih waktu
+    // Update Countdown Text
     const diff = nextPrayer.date - now;
-    const hours = Math.floor(diff / 3600000);
-    const minutes = Math.floor((diff % 3600000) / 60000);
-    const seconds = Math.floor((diff % 60000) / 1000);
-    
-    // Tampilkan countdown
-    document.getElementById("prayer-countdown").innerHTML = `
-        <span style="font-size: 0.9rem">Menuju ${nextPrayer.name} pukul ${nextPrayer.time}</span><br>
-        ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}
-    `;
-    
-    // Update informasi waktu shalat hari ini
+    if (diff >= 0) {
+        const hours = Math.floor(diff / 3600000);
+        const minutes = Math.floor((diff % 3600000) / 60000);
+        const seconds = Math.floor((diff % 60000) / 1000);
+        
+        document.getElementById("prayer-countdown").innerHTML = `
+            <span style="font-size: 0.9rem">Menuju ${nextPrayer.name} pukul ${nextPrayer.time}</span><br>
+            ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}
+        `;
+    }
+
+    // Update Kotak Waktu Shalat (Tanpa Highlight Seleksi)
     const todayTimesContainer = document.getElementById("today-times");
     todayTimesContainer.innerHTML = '';
     
-    // Tambahkan waktu shalat ke panel info
     const prayerNames = ["Imsak", "Subuh", "Zuhur", "Ashar", "Maghrib", "Isya"];
     for (let i = 0; i < prayerNames.length; i++) {
         const prayerDiv = document.createElement("div");
@@ -499,19 +515,14 @@ function updateNextPrayer() {
             <div class="prayer-name">${prayerNames[i]}</div>
             <div class="prayer-hour">${todayData[i+1]}</div>
         `;
-        if (prayerTimes[i].date > now && (!nextPrayer || prayerTimes[i].date <= nextPrayer.date)) {
-            prayerDiv.style.backgroundColor = "rgba(255, 255, 255, 0.3)";
-            prayerDiv.style.fontWeight = "bold";
-        }
+        
         todayTimesContainer.appendChild(prayerDiv);
     }
     
-    // Update tanggal Hijriah
-    const dayNumber = formatDayNumber(todayData[0]);
-    document.getElementById("hijri-date").textContent = `${dayNumber} Ramadhan 1447 H - ${todayData[0]}`;
+    const dayIndex = jadwalData.indexOf(todayData) + 1;
+    document.getElementById("hijri-date").textContent = `${dayIndex} Ramadhan 1447 H - ${todayData[0]}`;
 }
 
-// Fungsi untuk mengubah tema
 function toggleTheme() {
     const body = document.body;
     const themeButton = document.getElementById("theme-toggle");
@@ -527,12 +538,9 @@ function toggleTheme() {
     }
 }
 
-// Inisialisasi halaman
 document.addEventListener("DOMContentLoaded", function() {
-    // Render tabel
     renderTable(jadwalData);
     
-    // Setup pencarian
     document.getElementById("search-btn").addEventListener("click", searchDate);
     document.getElementById("search-input").addEventListener("keyup", function(event) {
         if (event.key === "Enter") {
@@ -540,21 +548,17 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
     
-    // Setup toggle tema
     document.getElementById("theme-toggle").addEventListener("click", toggleTheme);
     
-    // Periksa tema yang tersimpan
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark') {
         document.body.classList.add("dark-mode");
         document.getElementById("theme-toggle").innerHTML = '<i class="fas fa-sun"></i> <span>Mode Terang</span>';
     }
     
-    // Mulai update countdown waktu shalat
     updateNextPrayer();
     setInterval(updateNextPrayer, 1000);
     
-    // Scroll ke hari ini jika ada
     const todayRow = document.querySelector("tr.today");
     if (todayRow) {
         setTimeout(() => {
