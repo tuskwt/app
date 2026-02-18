@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jadwal Imsakiyah Ramadhan 1447 H - Sragen</title>
+    <title>Jadwal Imsakiyah Ramadhan 1446 H - Sragen</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -37,7 +37,7 @@
         }
 
         body {
-            font-family: 'Poppins', sans-serif;
+            font-family: Poppins;
             margin: 0;
             padding: 0;
             background-color: var(--background-color);
@@ -252,7 +252,6 @@
             background-color: rgba(255, 255, 255, 0.1);
             padding: 10px 5px;
             border-radius: 6px;
-            border: 1px solid transparent; /* Untuk menjaga layout saat border muncul */
         }
 
         .prayer-name {
@@ -265,19 +264,29 @@
             font-weight: 600;
             font-family: 'Courier New', monospace;
         }
+
+        .footer a[href*="chapteria"] {
+    color: #007bff !important; /* Mode terang */
+}
+
+@media (prefers-color-scheme: dark) {
+    .footer a[href*="chapteria"] {
+        color: #66b3ff !important; /* Mode gelap */
+    }
+}
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header">
-        <h1>Jadwal Imsakiyah Ramadhan 1447 H</h1>
+        <h1>Jadwal Imsakiyah Ramadhan 1446 H</h1>
         <div class="subtitle">Kabupaten Sragen</div>
     </div>
 
     <div class="info-panel">
         <div id="today-info">
-            <span id="hijri-date">Menunggu tanggal...</span>
+            <span id="hijri-date"></span>
         </div>
         <div id="prayer-countdown" class="prayer-countdown">
             Memuat waktu shalat berikutnya...
@@ -317,84 +326,75 @@
     </div>
 
     <div class="footer">
-        © 2026 Jadwal Imsakiyah Ramadhan. Sumber: Kementerian Agama Kabupaten Sragen. 
+        © 2025 Jadwal Imsakiyah Ramadhan by <a href="https://www.chapteria.com" target="_blank" rel="noopener">Chapteria</a>. Sumber: Bimas Islam Kementerian Agama. 
     </div>
 </div>
 
 <script>
 const jadwalData = [
-    ["Kamis, 19 Februari 2026", "04:13", "04:23", "11:53", "15:02", "18:02", "19:13"],
-    ["Jumat, 20 Februari 2026", "04:14", "04:24", "11:53", "15:01", "18:02", "19:12"],
-    ["Sabtu, 21 Februari 2026", "04:14", "04:24", "11:53", "15:00", "18:02", "19:12"],
-    ["Minggu, 22 Februari 2026", "04:14", "04:24", "11:53", "14:59", "18:01", "19:11"],
-    ["Senin, 23 Februari 2026", "04:14", "04:24", "11:53", "14:59", "18:01", "19:11"],
-    ["Selasa, 24 Februari 2026", "04:14", "04:24", "11:53", "14:58", "18:01", "19:10"],
-    ["Rabu, 25 Februari 2026", "04:15", "04:25", "11:52", "14:57", "18:00", "19:10"],
-    ["Kamis, 26 Februari 2026", "04:15", "04:25", "11:52", "14:56", "18:00", "19:10"],
-    ["Jumat, 27 Februari 2026", "04:15", "04:25", "11:52", "14:55", "18:00", "19:09"],
-    ["Sabtu, 28 Februari 2026", "04:15", "04:25", "11:52", "14:54", "17:59", "19:09"],
-    ["Minggu, 1 Maret 2026", "04:15", "04:25", "11:52", "14:53", "17:59", "19:08"],
-    ["Senin, 2 Maret 2026", "04:15", "04:25", "11:52", "14:52", "17:58", "19:08"],
-    ["Selasa, 3 Maret 2026", "04:15", "04:25", "11:51", "14:53", "17:58", "19:07"],
-    ["Rabu, 4 Maret 2026", "04:15", "04:25", "11:51", "14:53", "17:57", "19:07"],
-    ["Kamis, 5 Maret 2026", "04:15", "04:25", "11:51", "14:54", "17:57", "19:06"],
-    ["Jumat, 6 Maret 2026", "04:15", "04:25", "11:51", "14:54", "17:57", "19:06"],
-    ["Sabtu, 7 Maret 2026", "04:15", "04:25", "11:50", "14:55", "17:56", "19:05"],
-    ["Minggu, 8 Maret 2026", "04:15", "04:25", "11:50", "14:55", "17:56", "19:05"],
-    ["Senin, 9 Maret 2026", "04:15", "04:25", "11:50", "14:55", "17:55", "19:04"],
-    ["Selasa, 10 Maret 2026", "04:16", "04:26", "11:50", "14:56", "17:55", "19:04"],
-    ["Rabu, 11 Maret 2026", "04:16", "04:26", "11:49", "14:56", "17:54", "19:03"],
-    ["Kamis, 12 Maret 2026", "04:16", "04:26", "11:49", "14:56", "17:54", "19:03"],
-    ["Jumat, 13 Maret 2026", "04:15", "04:25", "11:49", "14:56", "17:53", "19:02"],
-    ["Sabtu, 14 Maret 2026", "04:15", "04:25", "11:49", "14:57", "17:53", "19:02"],
-    ["Minggu, 15 Maret 2026", "04:15", "04:25", "11:48", "14:57", "17:52", "19:01"],
-    ["Senin, 16 Maret 2026", "04:15", "04:25", "11:48", "14:57", "17:52", "19:01"],
-    ["Selasa, 17 Maret 2026", "04:15", "04:25", "11:48", "14:57", "17:51", "19:00"],
-    ["Rabu, 18 Maret 2026", "04:15", "04:25", "11:48", "14:58", "17:51", "19:00"],
-    ["Kamis, 19 Maret 2026", "04:15", "04:25", "11:47", "14:58", "17:50", "18:59"],
-    ["Jumat, 20 Maret 2026", "04:15", "04:25", "11:47", "14:58", "17:50", "18:59"]
+    ["Sabtu, 1 Maret 2025", "04:15", "04:25", "11:52", "14:53", "17:59", "19:08"],
+    ["Minggu, 2 Maret 2025", "04:15", "04:25", "11:52", "14:53", "17:58", "19:08"],
+    ["Senin, 3 Maret 2025", "04:15", "04:25", "11:51", "14:53", "17:58", "19:07"],
+    ["Selasa, 4 Maret 2025", "04:15", "04:25", "11:51", "14:53", "17:57", "19:07"],
+    ["Rabu, 5 Maret 2025", "04:15", "04:25", "11:51", "14:54", "17:57", "19:06"],
+    ["Kamis, 6 Maret 2025", "04:15", "04:25", "11:51", "14:54", "17:57", "19:06"],
+    ["Jumat, 7 Maret 2025", "04:15", "04:25", "11:50", "14:55", "17:56", "19:05"],
+    ["Sabtu, 8 Maret 2025", "04:15", "04:25", "11:50", "14:55", "17:56", "19:05"],
+    ["Minggu, 9 Maret 2025", "04:16", "04:26", "11:50", "14:55", "17:55", "19:04"],
+    ["Senin, 10 Maret 2025", "04:16", "04:26", "11:50", "14:56", "17:55", "19:04"],
+    ["Selasa, 11 Maret 2025", "04:16", "04:26", "11:49", "14:56", "17:54", "19:03"],
+    ["Rabu, 12 Maret 2025", "04:16", "04:26", "11:49", "14:56", "17:54", "19:03"],
+    ["Kamis, 13 Maret 2025", "04:16", "04:26", "11:49", "14:56", "17:53", "19:02"],
+    ["Jumat, 14 Maret 2025", "04:15", "04:25", "11:49", "14:57", "17:53", "19:01"],
+    ["Sabtu, 15 Maret 2025", "04:15", "04:25", "11:48", "14:57", "17:52", "19:01"],
+    ["Minggu, 16 Maret 2025", "04:15", "04:25", "11:48", "14:57", "17:52", "19:00"],
+    ["Senin, 17 Maret 2025", "04:15", "04:25", "11:48", "14:57", "17:51", "19:00"],
+    ["Selasa, 18 Maret 2025", "04:15", "04:25", "11:47", "14:58", "17:51", "18:59"],
+    ["Rabu, 19 Maret 2025", "04:15", "04:25", "11:47", "14:58", "17:50", "18:59"],
+    ["Kamis, 20 Maret 2025", "04:15", "04:25", "11:47", "14:58", "17:50", "18:58"],
+    ["Jumat, 21 Maret 2025", "04:15", "04:25", "11:47", "14:59", "17:50", "18:58"],
+    ["Sabtu, 22 Maret 2025", "04:15", "04:25", "11:47", "14:59", "17:49", "18:58"],
+    ["Minggu, 23 Maret 2025", "04:15", "04:25", "11:46", "14:58", "17:48", "18:57"],
+    ["Senin, 24 Maret 2025", "04:15", "04:25", "11:46", "14:58", "17:48", "18:56"],
+    ["Selasa, 25 Maret 2025", "04:15", "04:25", "11:45", "14:58", "17:47", "18:56"],
+    ["Rabu, 26 Maret 2025", "04:15", "04:25", "11:45", "14:58", "17:47", "18:55"],
+    ["Kamis, 27 Maret 2025", "04:15", "04:25", "11:45", "14:59", "17:46", "18:55"],
+    ["Jumat, 28 Maret 2025", "04:14", "04:24", "11:44", "14:59", "17:46", "18:54"],
+    ["Sabtu, 29 Maret 2025", "04:14", "04:24", "11:44", "14:59", "17:45", "18:54"],
+    ["Minggu, 30 Maret 2025", "04:14", "04:24", "11:44", "14:59", "17:45", "18:53"],
 ];
 
-const monthMap = {
-    "Januari": 0, "Februari": 1, "Maret": 2, "April": 3, "Mei": 4, "Juni": 5,
-    "Juli": 6, "Agustus": 7, "September": 8, "Oktober": 9, "November": 10, "Desember": 11
-};
-
-function parseDateRow(dateString) {
-    const parts = dateString.split(',')[1].trim().split(' '); 
-    const day = parseInt(parts[0]);
-    const monthIndex = monthMap[parts[1]];
-    const year = parseInt(parts[2]);
-    return new Date(year, monthIndex, day);
+// Fungsi untuk memformat nomor hari 
+function formatDayNumber(dateString) {
+    const day = parseInt(dateString.split(',')[1].trim().split(' ')[0]);
+    return day;
 }
 
-function isSameDate(date1, date2) {
-    return date1.getDate() === date2.getDate() &&
-           date1.getMonth() === date2.getMonth() &&
-           date1.getFullYear() === date2.getFullYear();
-}
-
+// Fungsi untuk mengisi tabel
 function renderTable(data) {
     const tbody = document.getElementById("jadwal-body");
     tbody.innerHTML = '';
     
-    // Gunakan tanggal simulasi jika user ingin melihat tampilan (Uncomment untuk test)
-    // const today = new Date(2026, 1, 19); 
-    const today = new Date(); 
+    // Mendapatkan tanggal saat ini 
+    const today = new Date();
+    const currentDateStr = `${today.getDate()} Maret 2025`;
     
     data.forEach((row, index) => {
         let tr = document.createElement("tr");
         
-        const rowDate = parseDateRow(row[0]);
-        
-        if (isSameDate(today, rowDate)) {
+        // Cek apakah hari ini
+        const dayNumber = formatDayNumber(row[0]);
+        if (dayNumber === today.getDate() && today.getMonth() === 2 && today.getFullYear() === 2025) {
             tr.classList.add("today");
         }
         
+        // Tambahkan kolom tanggal dengan nomor hari
         let tdDate = document.createElement("td");
-        tdDate.textContent = row[0];
+        const dateParts = row[0].split(',');
+        tdDate.innerHTML = `${dateParts[0]},${dateParts[1]}`;
         tr.appendChild(tdDate);
         
+        // Tambahkan kolom waktu shalat
         for (let i = 1; i < row.length; i++) {
             let td = document.createElement("td");
             td.textContent = row[i];
@@ -406,6 +406,7 @@ function renderTable(data) {
     });
 }
 
+// Fungsi untuk mencari tanggal
 function searchDate() {
     const searchText = document.getElementById("search-input").value.toLowerCase();
     if (!searchText) {
@@ -420,32 +421,23 @@ function searchDate() {
     renderTable(filteredData);
 }
 
+// Fungsi untuk menghitung waktu hingga shalat berikutnya
 function updateNextPrayer() {
-    // UNTUK TESTING/DEMO: Gunakan tanggal simulasi ini jika ingin melihat hasil "live"
-    // (Misal: 19 Februari 2026, jam 04:34 pagi)
-    // const now = new Date(2026, 1, 19, 4, 34, 0); 
-    
-    // UNTUK PRODUKSI: Gunakan waktu sistem
     const now = new Date();
-
-    let todayData = null;
-
-    for (let i = 0; i < jadwalData.length; i++) {
-        const d = parseDateRow(jadwalData[i][0]);
-        if (isSameDate(now, d)) {
-            todayData = jadwalData[i];
-            break;
-        }
-    }
+    const today = now.getDate();
+    
+    // Cari data untuk hari ini 
+    const todayData = jadwalData.find(row => {
+        const dayNumber = formatDayNumber(row[0]);
+        return dayNumber === today && now.getMonth() === 2 && now.getFullYear() === 2025;
+    });
     
     if (!todayData) {
-        document.getElementById("prayer-countdown").textContent = "Tanggal saat ini di luar jadwal Ramadhan 2026";
-        document.getElementById("hijri-date").textContent = "Menunggu Ramadhan 1447 H";
-        // Reset highlights
-        document.getElementById("today-times").innerHTML = '';
+        document.getElementById("prayer-countdown").textContent = "Diluar bulan Ramadhan";
         return;
     }
     
+    // Konversi waktu shalat ke Date objects
     const prayers = [
         {name: "Imsak", time: todayData[1]},
         {name: "Subuh", time: todayData[2]},
@@ -455,15 +447,15 @@ function updateNextPrayer() {
         {name: "Isya", time: todayData[6]}
     ];
     
-    // Buat array prayer dengan object Date lengkap
+    // Konversi waktu ke Date objects untuk perbandingan
     const prayerTimes = prayers.map(prayer => {
         const [hours, minutes] = prayer.time.split(':').map(Number);
-        const pDate = new Date(now);
-        pDate.setHours(hours, minutes, 0, 0);
-        return {...prayer, date: pDate};
+        const prayerDate = new Date();
+        prayerDate.setHours(hours, minutes, 0, 0);
+        return {...prayer, date: prayerDate};
     });
     
-    // --- 1. CARI NEXT PRAYER (Untuk Countdown) ---
+    // Cari waktu shalat berikutnya
     let nextPrayer = null;
     for (const prayer of prayerTimes) {
         if (prayer.date > now) {
@@ -472,41 +464,43 @@ function updateNextPrayer() {
         }
     }
     
+    // Jika tidak ada waktu shalat berikutnya hari ini, gunakan waktu Imsak besok
     if (!nextPrayer) {
-        // Cek hari esok untuk Imsak
-        const currentIndex = jadwalData.indexOf(todayData);
-        if (currentIndex + 1 < jadwalData.length) {
-            const tomorrowData = jadwalData[currentIndex + 1];
-            const tomorrowDate = parseDateRow(tomorrowData[0]);
-            const [hours, minutes] = tomorrowData[1].split(':').map(Number);
-            
-            const imsakTomorrow = new Date(tomorrowDate);
-            imsakTomorrow.setHours(hours, minutes, 0, 0);
-            
-            nextPrayer = {name: "Imsak", time: tomorrowData[1], date: imsakTomorrow}; 
+        const tomorrowIndex = jadwalData.findIndex(row => {
+            const dayNumber = formatDayNumber(row[0]);
+            return dayNumber === today && now.getMonth() === 2 && now.getFullYear() === 2025;
+        }) + 1;
+        
+        if (tomorrowIndex < jadwalData.length) {
+            const tomorrowData = jadwalData[tomorrowIndex];
+            const [hours, minutes] = tomorrowData[1].split(':').map(Number); // Imsak
+            const tomorrowDate = new Date();
+            tomorrowDate.setDate(tomorrowDate.getDate() + 1);
+            tomorrowDate.setHours(hours, minutes, 0, 0);
+            nextPrayer = {name: "Imsak (besok)", time: tomorrowData[1], date: tomorrowDate};
         } else {
-            document.getElementById("prayer-countdown").textContent = "Ramadhan 2026 telah berakhir";
+            document.getElementById("prayer-countdown").textContent = "Ramadhan telah berakhir";
             return;
         }
     }
     
-    // Update Countdown Text
+    // Hitung selisih waktu
     const diff = nextPrayer.date - now;
-    if (diff >= 0) {
-        const hours = Math.floor(diff / 3600000);
-        const minutes = Math.floor((diff % 3600000) / 60000);
-        const seconds = Math.floor((diff % 60000) / 1000);
-        
-        document.getElementById("prayer-countdown").innerHTML = `
-            <span style="font-size: 0.9rem">Menuju ${nextPrayer.name} pukul ${nextPrayer.time}</span><br>
-            ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}
-        `;
-    }
-
-    // Update Kotak Waktu Shalat (Tanpa Highlight Seleksi)
+    const hours = Math.floor(diff / 3600000);
+    const minutes = Math.floor((diff % 3600000) / 60000);
+    const seconds = Math.floor((diff % 60000) / 1000);
+    
+    // Tampilkan countdown
+    document.getElementById("prayer-countdown").innerHTML = `
+        <span style="font-size: 0.9rem">Menuju ${nextPrayer.name} pukul ${nextPrayer.time}</span><br>
+        ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}
+    `;
+    
+    // Update informasi waktu shalat hari ini
     const todayTimesContainer = document.getElementById("today-times");
     todayTimesContainer.innerHTML = '';
     
+    // Tambahkan waktu shalat ke panel info
     const prayerNames = ["Imsak", "Subuh", "Zuhur", "Ashar", "Maghrib", "Isya"];
     for (let i = 0; i < prayerNames.length; i++) {
         const prayerDiv = document.createElement("div");
@@ -515,14 +509,19 @@ function updateNextPrayer() {
             <div class="prayer-name">${prayerNames[i]}</div>
             <div class="prayer-hour">${todayData[i+1]}</div>
         `;
-        
+        if (prayerTimes[i].date > now && (!nextPrayer || prayerTimes[i].date <= nextPrayer.date)) {
+            prayerDiv.style.backgroundColor = "rgba(255, 255, 255, 0.3)";
+            prayerDiv.style.fontWeight = "bold";
+        }
         todayTimesContainer.appendChild(prayerDiv);
     }
     
-    const dayIndex = jadwalData.indexOf(todayData) + 1;
-    document.getElementById("hijri-date").textContent = `${dayIndex} Ramadhan 1447 H - ${todayData[0]}`;
+    // Update tanggal Hijriah
+    const dayNumber = formatDayNumber(todayData[0]);
+    document.getElementById("hijri-date").textContent = `${dayNumber} Ramadhan 1446 H - ${todayData[0]}`;
 }
 
+// Fungsi untuk mengubah tema
 function toggleTheme() {
     const body = document.body;
     const themeButton = document.getElementById("theme-toggle");
@@ -538,9 +537,12 @@ function toggleTheme() {
     }
 }
 
+// Inisialisasi halaman
 document.addEventListener("DOMContentLoaded", function() {
+    // Render tabel
     renderTable(jadwalData);
     
+    // Setup pencarian
     document.getElementById("search-btn").addEventListener("click", searchDate);
     document.getElementById("search-input").addEventListener("keyup", function(event) {
         if (event.key === "Enter") {
@@ -548,17 +550,21 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
     
+    // Setup toggle tema
     document.getElementById("theme-toggle").addEventListener("click", toggleTheme);
     
+    // Periksa tema yang tersimpan
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark') {
         document.body.classList.add("dark-mode");
         document.getElementById("theme-toggle").innerHTML = '<i class="fas fa-sun"></i> <span>Mode Terang</span>';
     }
     
+    // Mulai update countdown waktu shalat
     updateNextPrayer();
     setInterval(updateNextPrayer, 1000);
     
+    // Scroll ke hari ini jika ada
     const todayRow = document.querySelector("tr.today");
     if (todayRow) {
         setTimeout(() => {
