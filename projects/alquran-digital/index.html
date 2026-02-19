@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Al-Qur'an Digital - Instan Load</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        nu: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            800: '#064e3b',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        arabic: ['Amiri', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        .verse-text { line-height: 2.5; direction: rtl; }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #047857;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .playing-verse { background-color: #f0fdf4; border-left: 5px solid #059669; }
+        
+        /* Skeleton Loading Effect */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-black font-sans antialiased pb-24">
+
+    <!-- Navbar Sticky -->
+    <nav class="fixed top-0 w-full bg-nu-700 text-white shadow-md z-50" id="navbar">
+        <div class="max-w-3xl mx-auto px-4 h-16 flex items-center gap-3">
+            <button id="btn-back" class="hidden p-2 -ml-2 rounded-full hover:bg-nu-600 transition" onclick="goHome()">
+                <i class="fas fa-arrow-left text-xl"></i>
+            </button>
+            
+            <div class="flex flex-col flex-grow overflow-hidden">
+                <h1 id="nav-title" class="text-lg font-bold truncate">Al-Qur'an Digital</h1>
+                <span id="nav-subtitle" class="text-xs text-white opacity-90 truncate hidden"></span>
+            </div>
+
+            <button class="p-2 rounded-full hover:bg-nu-600">
+                <i class="fas fa-ellipsis-v"></i>
+            </button>
+        </div>
+        
+        <!-- Search Bar -->
+        <div id="search-container" class="max-w-3xl mx-auto px-4 pb-4">
+            <div class="relative">
+                <i class="fas fa-search absolute left-4 top-3 text-gray-400"></i>
+                <input type="text" id="search-input" placeholder="Cari surat..." 
+                    class="w-full pl-10 pr-4 py-2.5 rounded-xl border-none text-gray-900 bg-white shadow-md focus:ring-2 focus:ring-nu-500"
+                    onkeyup="filterSurahs()">
+            </div>
+        </div>
+    </nav>
+
+    <div id="nav-spacer" class="h-32 transition-all"></div>
+
+    <main class="max-w-3xl mx-auto px-4 min-h-screen">
+        
+        <!-- Loading UI -->
+        <div id="loading" class="hidden flex flex-col items-center justify-center py-20">
+            <div class="loader mb-4"></div>
+            <p id="loading-text" class="text-gray-900 font-semibold text-sm">Memuat Al-Qur'an...</p>
+        </div>
+
+        <!-- VIEW 1: DAFTAR SURAT -->
+        <div id="surah-list-view" class="bg-white rounded-xl shadow-sm border border-gray-200 divide-y divide-gray-100 overflow-hidden">
+            <!-- Data dimasukkan via JS -->
+        </div>
+
+        <!-- VIEW 2: DETAIL AYAT -->
+        <div id="surah-detail-view" class="hidden space-y-4">
+            <div id="bismillah-area" class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 text-center mb-6">
+                <p class="font-arabic text-3xl text-black">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</p>
+            </div>
+            <div id="verses-container" class="space-y-4"></div>
+        </div>
+
+        <!-- Error -->
+        <div id="error-message" class="hidden text-center py-10">
+            <p class="text-gray-900 mb-4 text-sm">Gagal memuat data.</p>
+            <button onclick="init(true)" class="bg-nu-700 text-white px-6 py-2 rounded-lg font-bold shadow-md">Coba Lagi</button>
+        </div>
+
+    </main>
+
+    <!-- Audio Player -->
+    <div id="audio-player" class="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 shadow-2xl transform translate-y-full transition-transform duration-300 z-50">
+        <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex flex-col w-2/3">
+                <span id="player-title" class="text-sm font-bold text-nu-800 truncate">Memutar...</span>
+                <span class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Misyari Rasyid Al-Afasy</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <audio id="main-audio" onended="audioEnded()"></audio>
+                <button onclick="togglePlay()" class="w-10 h-10 bg-nu-700 rounded-full flex items-center justify-center text-white shadow-lg">
+                    <i id="play-icon" class="fas fa-pause"></i>
+                </button>
+                <button onclick="stopAudio()" class="text-gray-400 hover:text-red-500 p-2">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        <div class="w-full bg-gray-100 h-1.5">
+            <div id="progress-bar" class="bg-nu-600 h-1.5 w-0 transition-all"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://equran.id/api/v2';
+        let allSurahs = [];
+        let activeVerseId = null;
+
+        const views = {
+            list: document.getElementById('surah-list-view'),
+            detail: document.getElementById('surah-detail-view'),
+            loading: document.getElementById('loading'),
+            error: document.getElementById('error-message'),
+            spacer: document.getElementById('nav-spacer'),
+            search: document.getElementById('search-container')
+        };
+        
+        const nav = {
+            backBtn: document.getElementById('btn-back'),
+            title: document.getElementById('nav-title'),
+            subtitle: document.getElementById('nav-subtitle')
+        };
+
+        const audio = {
+            el: document.getElementById('main-audio'),
+            player: document.getElementById('audio-player'),
+            title: document.getElementById('player-title'),
+            icon: document.getElementById('play-icon'),
+            progress: document.getElementById('progress-bar')
+        };
+
+        document.addEventListener('DOMContentLoaded', () => init());
+
+        audio.el.addEventListener('timeupdate', () => {
+            const percent = (audio.el.currentTime / audio.el.duration) * 100 || 0;
+            audio.progress.style.width = `${percent}%`;
+        });
+
+        // --- CACHE LOGIC ---
+        function getCache(key) {
+            const data = localStorage.getItem(key);
+            return data ? JSON.parse(data) : null;
+        }
+
+        function setCache(key, data) {
+            try {
+                localStorage.setItem(key, JSON.stringify(data));
+            } catch (e) { console.warn("Cache full"); }
+        }
+
+        async function init(forceRefresh = false) {
+            const cachedList = getCache('quran_surah_list');
+            
+            if (cachedList && !forceRefresh) {
+                allSurahs = cachedList;
+                renderSurahList(allSurahs);
+                views.list.classList.remove('hidden');
+                // Tetap fetch background untuk update jika ada perubahan tanpa loading UI
+                fetchSurahList(true); 
+            } else {
+                showLoading(true, "Memuat daftar surat...");
+                await fetchSurahList();
+            }
+        }
+
+        async function fetchSurahList(isSilent = false) {
+            try {
+                const res = await fetch(`${API_BASE}/surat`);
+                const json = await res.json();
+                if (json.code === 200) {
+                    allSurahs = json.data;
+                    setCache('quran_surah_list', allSurahs);
+                    renderSurahList(allSurahs);
+                    if (!isSilent) {
+                        views.loading.classList.add('hidden');
+                        views.list.classList.remove('hidden');
+                    }
+                    views.error.classList.add('hidden');
+                }
+            } catch (e) {
+                if (!allSurahs.length) views.error.classList.remove('hidden');
+                views.loading.classList.add('hidden');
+            }
+        }
+
+        function renderSurahList(surahs) {
+            views.list.innerHTML = '';
+            surahs.forEach(s => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center justify-between p-4 cursor-pointer hover:bg-nu-50 active:bg-nu-100 transition border-b border-gray-50';
+                div.onclick = () => loadSurahDetail(s.nomor);
+                div.innerHTML = `
+                    <div class="flex items-center gap-4">
+                        <div class="w-9 h-9 bg-nu-50 rounded-lg flex items-center justify-center text-sm font-bold text-nu-700 border border-nu-100">${s.nomor}</div>
+                        <div>
+                            <h3 class="font-bold text-gray-900">${s.namaLatin}</h3>
+                            <p class="text-[10px] text-gray-500 font-semibold uppercase tracking-tighter">${s.arti} • ${s.jumlahAyat} Ayat</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="font-arabic text-xl font-bold text-nu-800">${s.nama}</span>
+                        <i class="fas fa-chevron-right text-[10px] text-gray-300"></i>
+                    </div>
+                `;
+                views.list.appendChild(div);
+            });
+        }
+
+        async function loadSurahDetail(nomor) {
+            views.list.classList.add('hidden');
+            views.detail.classList.add('hidden');
+            views.search.classList.add('hidden');
+            views.spacer.classList.replace('h-32', 'h-16');
+
+            const cachedDetail = getCache(`surah_detail_${nomor}`);
+            
+            if (cachedDetail) {
+                setupSurahDetail(cachedDetail);
+                fetchSurahDetail(nomor, true); // Update background
+            } else {
+                showLoading(true, "Memuat ayat-ayat...");
+                await fetchSurahDetail(nomor);
+            }
+        }
+
+        async function fetchSurahDetail(nomor, isSilent = false) {
+            try {
+                const res = await fetch(`${API_BASE}/surat/${nomor}`);
+                const json = await res.json();
+                if (json.code === 200) {
+                    const s = json.data;
+                    setCache(`surah_detail_${nomor}`, s);
+                    if (!isSilent) {
+                        setupSurahDetail(s);
+                    }
+                }
+            } catch (e) {
+                if (!isSilent) {
+                    alert('Gagal memuat detail surat');
+                    goHome();
+                }
+            }
+        }
+
+        function setupSurahDetail(s) {
+            nav.title.textContent = s.namaLatin;
+            nav.subtitle.textContent = `${s.arti} • ${s.jumlahAyat} Ayat`;
+            nav.subtitle.classList.remove('hidden');
+            nav.backBtn.classList.remove('hidden');
+            renderVerses(s.ayat, s.namaLatin);
+            views.loading.classList.add('hidden');
+            views.detail.classList.remove('hidden');
+            window.scrollTo(0, 0);
+        }
+
+        function renderVerses(ayatList, surahName) {
+            const container = document.getElementById('verses-container');
+            container.innerHTML = '';
+            
+            const initialCount = 15;
+            const renderChunk = (list) => {
+                list.forEach(a => {
+                    const div = document.createElement('div');
+                    div.id = `v-${a.nomorAyat}`;
+                    div.className = 'bg-white p-6 rounded-2xl shadow-sm border border-gray-100 transition-all';
+                    div.innerHTML = `
+                        <div class="flex justify-between items-center mb-6">
+                            <span class="px-3 py-1 bg-nu-50 text-nu-700 rounded-full text-[10px] font-bold border border-nu-100">AYAT ${a.nomorAyat}</span>
+                            <button onclick="playAudio('${a.audio['05']}', ${a.nomorAyat}, '${surahName} : ${a.nomorAyat}')" 
+                                    class="w-9 h-9 flex items-center justify-center bg-nu-700 text-white rounded-full shadow-md hover:bg-nu-800 transition">
+                                <i class="fas fa-play text-[11px]"></i>
+                            </button>
+                        </div>
+                        <p class="font-arabic text-3xl text-right leading-[2.6] text-black mb-6 select-all">${a.teksArab}</p>
+                        <p class="text-base text-gray-900 leading-relaxed font-medium border-l-4 border-nu-500 pl-4 bg-gray-50 py-3 rounded-r-lg">${a.teksIndonesia}</p>
+                    `;
+                    container.appendChild(div);
+                });
+            };
+
+            renderChunk(ayatList.slice(0, initialCount));
+            
+            if (ayatList.length > initialCount) {
+                setTimeout(() => {
+                    renderChunk(ayatList.slice(initialCount));
+                }, 100);
+            }
+        }
+
+        function goHome() {
+            stopAudio();
+            views.detail.classList.add('hidden');
+            views.list.classList.remove('hidden');
+            views.search.classList.remove('hidden');
+            views.spacer.classList.replace('h-16', 'h-32');
+            nav.backBtn.classList.add('hidden');
+            nav.title.textContent = 'Al-Qur\'an Digital';
+            nav.subtitle.classList.add('hidden');
+            window.scrollTo(0, 0);
+        }
+
+        function playAudio(url, id, title) {
+            if (activeVerseId) document.getElementById(`v-${activeVerseId}`)?.classList.remove('playing-verse');
+            activeVerseId = id;
+            audio.el.src = url;
+            audio.title.textContent = title;
+            audio.player.classList.remove('translate-y-full');
+            const card = document.getElementById(`v-${id}`);
+            if (card) {
+                card.classList.add('playing-verse');
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            audio.el.play();
+            audio.icon.className = 'fas fa-pause';
+        }
+
+        function togglePlay() {
+            if (audio.el.paused) { audio.el.play(); audio.icon.className = 'fas fa-pause'; }
+            else { audio.el.pause(); audio.icon.className = 'fas fa-play'; }
+        }
+
+        function stopAudio() {
+            audio.el.pause();
+            audio.player.classList.add('translate-y-full');
+            if (activeVerseId) document.getElementById(`v-${activeVerseId}`)?.classList.remove('playing-verse');
+        }
+
+        function audioEnded() { audio.icon.className = 'fas fa-play'; }
+
+        function filterSurahs() {
+            const q = document.getElementById('search-input').value.toLowerCase();
+            const filtered = allSurahs.filter(s => s.namaLatin.toLowerCase().includes(q));
+            renderSurahList(filtered);
+        }
+
+        function showLoading(show, text = "Memuat Al-Qur'an...") {
+            const loadingText = document.getElementById('loading-text');
+            if (loadingText) loadingText.textContent = text;
+            if (show) views.loading.classList.remove('hidden');
+            else views.loading.classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
