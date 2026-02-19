@@ -357,26 +357,21 @@
             audio.el.play();
             audio.icon.className = 'fas fa-pause';
         }
-
         function togglePlay() {
             if (audio.el.paused) { audio.el.play(); audio.icon.className = 'fas fa-pause'; }
             else { audio.el.pause(); audio.icon.className = 'fas fa-play'; }
         }
-
         function stopAudio() {
             audio.el.pause();
             audio.player.classList.add('translate-y-full');
             if (activeVerseId) document.getElementById(`v-${activeVerseId}`)?.classList.remove('playing-verse');
         }
-
         function audioEnded() { audio.icon.className = 'fas fa-play'; }
-
         function filterSurahs() {
             const q = document.getElementById('search-input').value.toLowerCase();
             const filtered = allSurahs.filter(s => s.namaLatin.toLowerCase().includes(q));
             renderSurahList(filtered);
         }
-
         function showLoading(show, text = "Memuat Al-Qur'an...") {
             const loadingText = document.getElementById('loading-text');
             if (loadingText) loadingText.textContent = text;
