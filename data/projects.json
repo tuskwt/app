@@ -7,13 +7,6 @@
     "gradient": "icon-grad-1"
   },
   {
-    "id": "kode-guru-9884",
-    "name": "Kode Guru",
-    "path": "projects/kode-guru/index.html",
-    "icon": "group",
-    "gradient": "icon-grad-1"
-  },
-  {
     "id": "kalenderku",
     "name": "Kalender",
     "path": "projects/kalenderku/index.html",
@@ -26,5 +19,19 @@
     "path": "projects/jadwal-puasa/index.html",
     "icon": "mosque",
     "gradient": "icon-grad-5"
+  },
+  {
+    "id": "al-quran-digital-9342",
+    "name": "Al-Quran Digital",
+    "path": "projects/alquran-digital/index.html",
+    "icon": "book_2",
+    "gradient": "icon-grad-5"
+  },
+  {
+    "id": "kode-guru-9884",
+    "name": "Kode Guru",
+    "path": "projects/kode-guru/index.html",
+    "icon": "group",
+    "gradient": "icon-grad-1"
   }
 ]
