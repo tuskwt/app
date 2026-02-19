@@ -14,8 +14,8 @@
             --secondary: #d97706;
             --bg-body: #f1f5f9;
             --bg-card: #ffffff;
-            --text-main: #000000; /* Hitam pekat sebagai standar utama */
-            --text-muted: #1e293b; /* Sangat gelap, bukan abu-abu, untuk label */
+            --text-main: #000000;
+            --text-muted: #1e293b;
             --border: #cbd5e1;
             --accent: #f59e0b;
             --text-date: #000000; 
@@ -27,8 +27,8 @@
             --secondary: #fbbf24;
             --bg-body: #0f172a;
             --bg-card: #1e293b;
-            --text-main: #ffffff; /* Putih terang */
-            --text-muted: #f1f5f9; /* Putih/Sangat terang */
+            --text-main: #ffffff;
+            --text-muted: #f1f5f9;
             --border: #334155;
             --accent: #fbbf24;
             --text-date: #ffffff;
@@ -69,7 +69,6 @@
             overflow: hidden;
         }
 
-        /* Ikon Watermark - Diposisikan lebih rendah lagi */
         .hero::before {
             content: "\f678"; 
             font-family: "Font Awesome 6 Free";
@@ -92,11 +91,22 @@
 
         .hero p {
             margin: 4px 0 0;
-            opacity: 1; /* Hilangkan transparansi */
             font-size: 0.9rem;
             position: relative;
             z-index: 2;
             font-weight: 500;
+        }
+
+        #current-date-display {
+            display: block;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 50px;
+            display: inline-block;
+            position: relative;
+            z-index: 2;
         }
 
         /* Countdown Card */
@@ -114,8 +124,16 @@
             font-weight: 700;
             color: var(--secondary);
             display: block;
-            margin-bottom: 8px;
-            font-size: 1rem;
+            margin-bottom: 4px;
+            font-size: 1.1rem;
+        }
+
+        #fasting-info {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 12px;
+            display: block;
         }
 
         #prayer-countdown {
@@ -239,7 +257,7 @@
             background: var(--bg-body);
             padding: 16px 10px;
             text-align: center;
-            color: var(--text-main); /* Pastikan header hitam */
+            color: var(--text-main);
             font-weight: 800;
             font-size: 0.75rem;
             text-transform: uppercase;
@@ -258,7 +276,6 @@
             font-weight: 500;
         }
 
-        /* Sticky Column No-Transparency */
         .date-col {
             position: sticky;
             left: 0;
@@ -282,7 +299,6 @@
             font-size: 0.9rem;
         }
 
-        /* Tanggal Hitam Pekat */
         .date-col .date-val {
             display: block;
             font-size: 0.75rem;
@@ -352,10 +368,12 @@
     <header class="hero">
         <h1>Imsakiyah 1447 H</h1>
         <p>Kabupaten Sragen, Jawa Tengah</p>
+        <span id="current-date-display">...</span>
     </header>
 
     <div class="countdown-card">
         <span id="hijri-date">Memuat data...</span>
+        <span id="fasting-info">Puasa ke-.. (Sisa .. hari)</span>
         <div class="next-prayer-label" id="next-label" style="font-size: 0.85rem; text-transform: uppercase;">Menuju Waktu</div>
         <div id="prayer-countdown">00:00:00</div>
         
@@ -438,6 +456,8 @@ const jadwalData = [
 ];
 
 const monthMap = { "Januari":0,"Februari":1,"Maret":2,"April":3,"Mei":4,"Juni":5,"Juli":6,"Agustus":7,"September":8,"Oktober":9,"November":10,"Desember":11 };
+const dayMap = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
 function parseDateRow(dateString) {
     const parts = dateString.split(',')[1].trim().split(' '); 
@@ -446,6 +466,10 @@ function parseDateRow(dateString) {
 
 function isSameDate(date1, date2) {
     return date1.getDate() === date2.getDate() && date1.getMonth() === date2.getMonth() && date1.getFullYear() === date2.getFullYear();
+}
+
+function formatDate(date) {
+    return `${dayMap[date.getDay()]}, ${date.getDate()} ${monthNames[date.getMonth()]} ${date.getFullYear()}`;
 }
 
 function renderTable(data) {
@@ -481,17 +505,41 @@ function updateUI() {
     let todayData = null;
     let ramadhanDay = 0;
 
+    // Update Tampilan Tanggal Masehi Hari Ini
+    document.getElementById("current-date-display").textContent = formatDate(now);
+
     for (let i = 0; i < jadwalData.length; i++) {
         const d = parseDateRow(jadwalData[i][0]);
-        if (isSameDate(now, d)) { todayData = jadwalData[i]; ramadhanDay = i+1; break; }
+        if (isSameDate(now, d)) { 
+            todayData = jadwalData[i]; 
+            ramadhanDay = i + 1; 
+            break; 
+        }
     }
 
     if (!todayData) {
-        document.getElementById("hijri-date").textContent = "Ramadhan 1447 H Segera Tiba";
+        // Cek jika sebelum ramadhan atau setelah ramadhan
+        const firstDay = parseDateRow(jadwalData[0][0]);
+        if (now < firstDay) {
+            const diff = Math.ceil((firstDay - now) / (1000 * 60 * 60 * 24));
+            document.getElementById("hijri-date").textContent = "Ramadhan 1447 H";
+            document.getElementById("fasting-info").textContent = `Kurang ${diff} hari lagi menuju puasa`;
+        } else {
+            document.getElementById("hijri-date").textContent = "Ramadhan Telah Usai";
+            document.getElementById("fasting-info").textContent = "Sampai jumpa di Ramadhan berikutnya";
+        }
         return;
     }
 
     document.getElementById("hijri-date").textContent = `${ramadhanDay} Ramadhan 1447 H`;
+    
+    // Informasi Sisa Hari
+    const totalDays = jadwalData.length;
+    const remainingDays = totalDays - ramadhanDay;
+    const infoText = remainingDays > 0 
+        ? `Puasa ke-${ramadhanDay} (Sisa ${remainingDays} hari lagi)` 
+        : `Puasa ke-${ramadhanDay} (Hari Terakhir)`;
+    document.getElementById("fasting-info").textContent = infoText;
 
     const prayers = [
         {name: "Imsak", time: todayData[1]}, {name: "Subuh", time: todayData[2]},
