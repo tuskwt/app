@@ -199,7 +199,6 @@
                 allSurahs = cachedList;
                 renderSurahList(allSurahs);
                 views.list.classList.remove('hidden');
-                // Tetap fetch background untuk update jika ada perubahan tanpa loading UI
                 fetchSurahList(true); 
             } else {
                 showLoading(true, "Memuat daftar surat...");
@@ -260,7 +259,7 @@
             
             if (cachedDetail) {
                 setupSurahDetail(cachedDetail);
-                fetchSurahDetail(nomor, true); // Update background
+                fetchSurahDetail(nomor, true);
             } else {
                 showLoading(true, "Memuat ayat-ayat...");
                 await fetchSurahDetail(nomor);
@@ -316,6 +315,12 @@
                             </button>
                         </div>
                         <p class="font-arabic text-3xl text-right leading-[2.6] text-black mb-6 select-all">${a.teksArab}</p>
+                        
+                        <!-- TEKS LATIN (Transliterasi) -->
+                        <p class="text-sm text-teal-600 italic font-medium mb-3 leading-relaxed">
+                            ${a.teksLatin}
+                        </p>
+
                         <p class="text-base text-gray-900 leading-relaxed font-medium border-l-4 border-nu-500 pl-4 bg-gray-50 py-3 rounded-r-lg">${a.teksIndonesia}</p>
                     `;
                     container.appendChild(div);
@@ -357,21 +362,26 @@
             audio.el.play();
             audio.icon.className = 'fas fa-pause';
         }
+
         function togglePlay() {
             if (audio.el.paused) { audio.el.play(); audio.icon.className = 'fas fa-pause'; }
             else { audio.el.pause(); audio.icon.className = 'fas fa-play'; }
         }
+
         function stopAudio() {
             audio.el.pause();
             audio.player.classList.add('translate-y-full');
             if (activeVerseId) document.getElementById(`v-${activeVerseId}`)?.classList.remove('playing-verse');
         }
+
         function audioEnded() { audio.icon.className = 'fas fa-play'; }
+
         function filterSurahs() {
             const q = document.getElementById('search-input').value.toLowerCase();
             const filtered = allSurahs.filter(s => s.namaLatin.toLowerCase().includes(q));
             renderSurahList(filtered);
         }
+
         function showLoading(show, text = "Memuat Al-Qur'an...") {
             const loadingText = document.getElementById('loading-text');
             if (loadingText) loadingText.textContent = text;
