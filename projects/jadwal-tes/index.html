@@ -46,15 +46,6 @@
             <!-- Data akan di-render oleh JavaScript di sini -->
         </main>
 
-        <div id="noResult" class="hidden text-center py-10 px-4">
-            <div class="text-slate-400 mb-2">
-                <svg class="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-            </div>
-            <h3 class="text-lg font-medium text-slate-900">Tidak ada jadwal ditemukan</h3>
-            <p class="text-sm text-slate-500 mt-1">Coba cari dengan nama atau kode lain.</p>
-        </div>
     </div>
 
     <script>
@@ -175,7 +166,6 @@
 
         function renderSchedule(filterText = "") {
             container.innerHTML = "";
-            let hasVisibleCards = false;
             filterText = filterText.toLowerCase();
 
             // Hanya proses data untuk hari yang aktif/dipilih
@@ -196,85 +186,87 @@
                 return name.includes(filterText) || code === filterText || "cadangan".includes(filterText);
             });
 
-            // Tampilkan data jika ada jadwal reguler yang cocok ATAU ada cadangan yang cocok ATAU tidak ada filter
-            if (filterText === "" || filteredSlots.length > 0 || cadanganMatches.length > 0) {
-                hasVisibleCards = true;
-                
-                const card = document.createElement('div');
-                card.className = "bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-5";
+            const card = document.createElement('div');
+            card.className = "bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-5";
 
-                // Header Hari
-                let html = `
-                    <div class="bg-indigo-50/50 px-4 py-3 border-b border-slate-100 flex items-center">
-                        <svg class="w-5 h-5 text-indigo-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                        <h2 class="text-base font-bold text-slate-800">${dayData.day}</h2>
-                    </div>
-                    <div class="divide-y divide-slate-100">
-                `;
+            // Header Hari
+            let html = `
+                <div class="bg-indigo-50/50 px-4 py-3 border-b border-slate-100 flex items-center">
+                    <svg class="w-5 h-5 text-indigo-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    <h2 class="text-base font-bold text-slate-800">${dayData.day}</h2>
+                </div>
+                <div class="divide-y divide-slate-100">
+            `;
 
-                // Body List Slots
-                const slotsToRender = filterText === "" ? dayData.slots : filteredSlots;
-                
-                if (slotsToRender.length > 0) {
-                    slotsToRender.forEach(slot => {
-                        html += `
-                            <div class="flex items-center p-3 hover:bg-slate-50 transition-colors">
-                                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-sm mr-3 border border-blue-200">
-                                    ${slot.id}
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <p class="text-sm font-semibold text-slate-800 truncate">${getTeacherName(slot.code)}</p>
-                                    <p class="text-xs text-slate-500 mt-0.5">Kode: <span class="font-medium text-indigo-600">${slot.code}</span></p>
-                                </div>
+            // Body List Slots
+            const slotsToRender = filterText === "" ? dayData.slots : filteredSlots;
+            
+            if (slotsToRender.length > 0) {
+                slotsToRender.forEach(slot => {
+                    html += `
+                        <div class="flex items-center p-3 hover:bg-slate-50 transition-colors">
+                            <div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-sm mr-3 border border-blue-200">
+                                ${slot.id}
                             </div>
-                        `;
-                    });
-                } else if (filterText !== "" && cadanganMatches.length > 0) {
-                     html += `
-                        <div class="p-4 text-center text-sm text-slate-500 italic">
-                            Tidak ada jam reguler, bertugas sebagai cadangan.
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-semibold text-slate-800 truncate">${getTeacherName(slot.code)}</p>
+                                <p class="text-xs text-slate-500 mt-0.5">Kode: <span class="font-medium text-indigo-600">${slot.code}</span></p>
+                            </div>
                         </div>
                     `;
-                }
+                });
+            } else if (filterText !== "") {
+                // Tampilan jika tidak ada kecocokan di jadwal reguler
+                html += `
+                    <div class="px-4 py-8 text-center bg-slate-50/50">
+                        <svg class="mx-auto h-10 w-10 text-slate-300 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        <p class="text-sm font-medium text-slate-600">Pencarian tidak ditemukan</p>
+                        <p class="text-xs text-slate-400 mt-1">Tidak ada jadwal reguler untuk kata kunci ini. (Hore prei!! eitss.. bisa saja kamu gantiin guru yang berhalangan hadir lainnya ketika cadangan sudah kepakai semua. 😛).</p>
+                    </div>
+                `;
+            }
 
-                html += `</div>`;
+            html += `</div>`;
 
-                // Cadangan Section
-                // Jika sedang mencari, sorot yang dicari. Jika tidak, tampilkan semua.
-                const cadanganToRender = filterText === "" ? dayData.cadangan : (cadanganMatches.length > 0 ? cadanganMatches : dayData.cadangan);
-                
-                if (cadanganToRender.length > 0) {
-                    const cadanganList = cadanganToRender.map(c => `
-                        <li class="flex items-center space-x-2">
-                            <span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span>
-                            <span class="text-sm font-medium text-slate-800">${getTeacherName(c)} <span class="text-orange-600 text-xs">(${c})</span></span>
-                        </li>
-                    `).join('');
-
-                    html += `
-                        <div class="bg-orange-50/70 p-3 border-t border-orange-100">
-                            <div class="flex items-center mb-1">
+            // Cadangan Section
+            // Jika ada filter tapi tidak cocok sama sekali (reguler & cadangan) -> Tampilkan SEMUA cadangan sebagai info standby
+            const cadanganToRender = filterText === "" 
+                ? dayData.cadangan 
+                : (cadanganMatches.length > 0 ? cadanganMatches : dayData.cadangan);
+            
+            if (cadanganToRender.length > 0) {
+                html += `
+                    <div class="bg-orange-50/40 border-t border-orange-100 divide-y divide-orange-100/60">
+                        <div class="px-4 py-2 bg-orange-100/50 flex items-center justify-between">
+                            <div class="flex items-center">
                                 <svg class="w-4 h-4 text-orange-600 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                 <h3 class="text-xs font-bold text-orange-800 uppercase tracking-wide">Tim Cadangan</h3>
                             </div>
-                            <ul class="space-y-1 ml-5">
-                                ${cadanganList}
-                            </ul>
+                            ${filterText !== "" && cadanganMatches.length === 0 ? '<span class="text-[10px] bg-orange-200 text-orange-800 px-2 py-0.5 rounded-full font-medium">Standby</span>' : ''}
+                        </div>
+                `;
+                
+                cadanganToRender.forEach(c => {
+                    html += `
+                        <div class="flex items-center p-3 hover:bg-orange-50 transition-colors">
+                            <div class="flex-shrink-0 w-10 h-10 rounded-full bg-orange-100 text-orange-700 flex items-center justify-center font-bold text-xs mr-3 border border-orange-200">
+                                CDG
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-semibold text-slate-800 truncate">${getTeacherName(c)}</p>
+                                <p class="text-xs text-slate-500 mt-0.5">Kode: <span class="font-medium text-orange-600">${c}</span></p>
+                            </div>
                         </div>
                     `;
-                }
+                });
 
-                card.innerHTML = html;
-                container.appendChild(card);
+                html += `</div>`;
             }
 
-            if (hasVisibleCards) {
-                noResult.classList.add('hidden');
-                container.classList.remove('hidden');
-            } else {
-                noResult.classList.remove('hidden');
-                container.classList.add('hidden');
-            }
+            card.innerHTML = html;
+            container.appendChild(card);
         }
 
         // Event Listener untuk fitur cari
