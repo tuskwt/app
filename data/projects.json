@@ -1,5 +1,12 @@
 [
   {
+    "id": "jadwal-tes-2025-2026-0674",
+    "name": "Jadwal Tes 2025/2026",
+    "path": "projects/jadwal-tes/index.html",
+    "icon": "list",
+    "gradient": "icon-grad-4"
+  },
+  {
     "id": "jadwal-mengajarku",
     "name": "Jadwal Mengajar",
     "path": "projects/jadwal-mengajarku/index.html",
