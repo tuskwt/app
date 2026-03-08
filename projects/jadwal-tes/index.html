@@ -32,7 +32,7 @@
                 </div>
                 <input type="text" id="searchInput" 
                     class="block w-full pl-10 pr-3 py-2 border border-transparent rounded-xl leading-5 bg-white/10 text-white placeholder-blue-200 focus:outline-none focus:bg-white focus:text-slate-900 focus:placeholder-slate-400 focus:ring-0 sm:text-sm transition-colors duration-200" 
-                    placeholder="Cari Nama atau Kode (Cth: D, Sage, Cadangan)">
+                    placeholder="Cari Nama, Kode, atau Ruang (Cth: D, Sage, 12)">
             </div>
 
             <!-- Tab Menu Hari -->
@@ -196,7 +196,8 @@
             const filteredSlots = dayData.slots.filter(slot => {
                 const name = getTeacherName(slot.code).toLowerCase();
                 const code = slot.code.toLowerCase();
-                return name.includes(filterText) || code === filterText;
+                const roomId = slot.id.toLowerCase();
+                return name.includes(filterText) || code === filterText || roomId === filterText;
             });
 
             // Filter Cadangan
