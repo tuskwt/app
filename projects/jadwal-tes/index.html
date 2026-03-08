@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Jadwal Pengawas Maret 2026</title>
+    <title>Jadwal Pengawas ASTSG & ASASG 2025/2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Mencegah highlight biru saat di-tap di HP */
@@ -65,10 +65,15 @@
             "AO": "Zulfa Ika Agustina, S.Pd."
         };
 
-        // Data Jadwal
+        // Data Jadwal dengan tambahan Jadwal Mapel Ujian
         const rawSchedule = [
             {
                 day: "Senin, 9 Maret 2026",
+                mapel: [
+                    { time: "07.30 - 09.00", subject: "Pendidikan Agama dan Budi Pekerti (X, XI, XII)" },
+                    { time: "09.15 - 10.45", subject: "Bahasa Jawa (X, XI, XII)" },
+                    { time: "11.00 - 12.30", subject: "Informatika (X)" }
+                ],
                 slots: [
                     { id: "1", code: "D" }, { id: "2", code: "AE" }, { id: "3", code: "H" }, { id: "4", code: "I" },
                     { id: "5", code: "AF" }, { id: "6", code: "AG" }, { id: "7", code: "N" }, { id: "8", code: "AH" },
@@ -81,6 +86,10 @@
             },
             {
                 day: "Selasa, 10 Maret 2026",
+                mapel: [
+                    { time: "07.30 - 09.00", subject: "Pendidikan Pancasila (X, XI, XII)" },
+                    { time: "09.15 - 10.45", subject: "Penjasorkes (X & XI)" }
+                ],
                 slots: [
                     { id: "1", code: "U" }, { id: "2", code: "AL" }, { id: "3", code: "AF" }, { id: "4", code: "Z" },
                     { id: "5", code: "AJ" }, { id: "6", code: "AE" }, { id: "7", code: "D" }, { id: "8", code: "AK" },
@@ -93,6 +102,11 @@
             },
             {
                 day: "Rabu, 11 Maret 2026",
+                mapel: [
+                    { time: "07.30 - 09.00", subject: "Matematika (X, XI, XII)" },
+                    { time: "09.15 - 10.45", subject: "Sejarah (X & XI), PKKWU (Kelas XII)" },
+                    { time: "11.00 - 12.30", subject: "Mapel Pilihan: Koding (X)" }
+                ],
                 slots: [
                     { id: "1", code: "B" }, { id: "2", code: "AA" }, { id: "3", code: "AK" }, { id: "4", code: "D" },
                     { id: "5", code: "U" }, { id: "6", code: "AF" }, { id: "7", code: "H" }, { id: "8", code: "W" },
@@ -105,6 +119,10 @@
             },
             {
                 day: "Kamis, 12 Maret 2026",
+                mapel: [
+                    { time: "07.30 - 09.00", subject: "Bahasa Indonesia (X, XI, XII)" },
+                    { time: "09.15 - 10.45", subject: "IPAS (X)" }
+                ],
                 slots: [
                     { id: "1", code: "D" }, { id: "2", code: "B" }, { id: "3", code: "H" }, { id: "4", code: "I" },
                     { id: "5", code: "N" }, { id: "6", code: "Q" }, { id: "7", code: "R" }, { id: "8", code: "U" },
@@ -117,6 +135,10 @@
             },
             {
                 day: "Jumat, 13 Maret 2026",
+                mapel: [
+                    { time: "07.30 - 09.00", subject: "Bahasa Inggris (X, XI, XII)" },
+                    { time: "09.15 - 10.45", subject: "Seni Budaya (X)" }
+                ],
                 slots: [
                     { id: "1", code: "AA" }, { id: "2", code: "AB" }, { id: "3", code: "AC" }, { id: "4", code: "AF" },
                     { id: "5", code: "AG" }, { id: "6", code: "AH" }, { id: "7", code: "AI" }, { id: "8", code: "AK" },
@@ -131,7 +153,6 @@
 
         const container = document.getElementById('scheduleContainer');
         const searchInput = document.getElementById('searchInput');
-        const noResult = document.getElementById('noResult');
         const tabContainer = document.getElementById('tabContainer');
 
         let activeTabIndex = 0; // Default ke hari pertama (Senin)
@@ -189,11 +210,23 @@
             const card = document.createElement('div');
             card.className = "bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-5";
 
-            // Header Hari
+            // Header Hari & Jadwal Mapel
+            let mapelHtml = dayData.mapel.map(m => `
+                <div class="flex items-start text-xs text-slate-600 mb-1">
+                    <span class="font-mono bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded text-[10px] font-bold mr-2 mt-0.5 shrink-0 whitespace-nowrap">${m.time}</span>
+                    <span class="leading-tight">${m.subject}</span>
+                </div>
+            `).join('');
+
             let html = `
-                <div class="bg-indigo-50/50 px-4 py-3 border-b border-slate-100 flex items-center">
-                    <svg class="w-5 h-5 text-indigo-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                    <h2 class="text-base font-bold text-slate-800">${dayData.day}</h2>
+                <div class="bg-indigo-50/50 px-4 py-3 border-b border-indigo-100">
+                    <div class="flex items-center mb-2">
+                        <svg class="w-5 h-5 text-indigo-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        <h2 class="text-base font-bold text-slate-800">${dayData.day}</h2>
+                    </div>
+                    <div class="bg-white/60 rounded-lg p-2.5 border border-indigo-50">
+                        ${mapelHtml}
+                    </div>
                 </div>
                 <div class="divide-y divide-slate-100">
             `;
@@ -223,7 +256,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
                         <p class="text-sm font-medium text-slate-600">Pencarian tidak ditemukan</p>
-                        <p class="text-xs text-slate-400 mt-1">Tidak ada jadwal reguler untuk kata kunci ini. (Hore prei!! eitss.. bisa saja kamu gantiin guru yang berhalangan hadir lainnya ketika cadangan sudah kepakai semua. 😛).</p>
+                        <p class="text-xs text-slate-400 mt-1">Tidak ada jadwal reguler untuk kata kunci ini.</p>
                     </div>
                 `;
             }
