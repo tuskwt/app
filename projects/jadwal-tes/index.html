@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Jadwal Pengawas Maret 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Mencegah highlight biru saat di-tap di HP */
+        * { -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        
+        /* Sembunyikan scrollbar untuk tab menu */
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-slate-100 pb-12">
+
+    <!-- Container Utama menyesuaikan lebar layar HP -->
+    <div class="max-w-md mx-auto bg-slate-100 min-h-screen shadow-lg relative">
+        
+        <!-- Header & Search Bar -->
+        <header class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white pt-6 pb-4 px-4 sticky top-0 z-20 shadow-md">
+            <h1 class="text-xl font-bold text-center mb-1 leading-tight">Jadwal Pengawas ASTSG & ASASG 2025/2026</h1>
+            
+            <div class="relative mt-4">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg class="h-5 w-5 text-slate-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <input type="text" id="searchInput" 
+                    class="block w-full pl-10 pr-3 py-2 border border-transparent rounded-xl leading-5 bg-white/10 text-white placeholder-blue-200 focus:outline-none focus:bg-white focus:text-slate-900 focus:placeholder-slate-400 focus:ring-0 sm:text-sm transition-colors duration-200" 
+                    placeholder="Cari Nama atau Kode (Cth: D, Sage, Cadangan)">
+            </div>
+
+            <!-- Tab Menu Hari -->
+            <div class="flex overflow-x-auto mt-4 gap-2 pb-1 hide-scrollbar" id="tabContainer">
+                <!-- Tombol hari akan di-render di sini oleh JavaScript -->
+            </div>
+        </header>
+
+        <!-- Area Konten Jadwal -->
+        <main id="scheduleContainer" class="p-4 space-y-5">
+            <!-- Data akan di-render oleh JavaScript di sini -->
+        </main>
+
+        <div id="noResult" class="hidden text-center py-10 px-4">
+            <div class="text-slate-400 mb-2">
+                <svg class="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+            <h3 class="text-lg font-medium text-slate-900">Tidak ada jadwal ditemukan</h3>
+            <p class="text-sm text-slate-500 mt-1">Coba cari dengan nama atau kode lain.</p>
+        </div>
+    </div>
+
+    <script>
+        // Data Guru
+        const teachers = {
+            "A": "Didik Darmawan, S.Pd.", "B": "Rindang Sri Karyani, S.Pd.", "D": "Sage Tripasia, S.Pd.",
+            "E": "Didik Karuniawan, S.Pd.", "F": "Atik Sujiyati, S.Pd.", "G": "Pancar Doso Saktono, S.Pd.",
+            "H": "Hartono, S.Pd.", "I": "Awig Sembudi, S.T.", "L": "Riris Purnomowati, S.Pd.",
+            "M": "R. Dwiyanti Endang Lestari, S.Si.", "N": "Joko Widianto, M.Pd.", "Q": "Samino, S.T.",
+            "R": "Muhammad Mukhlis, S.Pd.", "S": "Alan Pebrianto, S.Pd.", "T": "Adi Setyawan, S.Kom.",
+            "U": "Bang Tyox.", "V": "May Vira Diantika, S.Pd.", "W": "Yusuf Awandy, S.T.",
+            "X": "Muhammad Syarifudin, S.T.", "Y": "Oeksi Dwi Prihatiningtyas, S.Pd.", "Z": "Dimas Wahyu Galang RA, S.T.",
+            "AA": "Muhammad Nashir, S.Ag.", "AB": "Adila Rahman Hijrianto, S.Pd.", "AC": "Rini Setyowati, S.Pd.",
+            "AE": "Fajar Loubhis, M.Pd.", "AF": "Adri Caka.", "AG": "Den.",
+            "AH": "Damai Ikhsan Rahmadi, S.T.", "AI": "Facacha Fatchi Zarinu Aslich, S.T.", "AJ": "Hery Purwanto, S.Pd.",
+            "AK": "Hanshel.", "AL": "Novia Anggraeni Puji Hastuti, S.Pd.", "AM": "Heskia Surya Prasetya, S.Kom",
+            "AO": "Zulfa Ika Agustina, S.Pd."
+        };
+
+        // Data Jadwal
+        const rawSchedule = [
+            {
+                day: "Senin, 9 Maret 2026",
+                slots: [
+                    { id: "1", code: "D" }, { id: "2", code: "AE" }, { id: "3", code: "H" }, { id: "4", code: "I" },
+                    { id: "5", code: "AF" }, { id: "6", code: "AG" }, { id: "7", code: "N" }, { id: "8", code: "AH" },
+                    { id: "9", code: "Q" }, { id: "10", code: "R" }, { id: "11", code: "AI" }, { id: "12", code: "AM" },
+                    { id: "13", code: "U" }, { id: "14", code: "V" }, { id: "15", code: "AJ" }, { id: "16", code: "X" },
+                    { id: "17", code: "AK" }, { id: "18", code: "Z" }, { id: "19", code: "AL" }, { id: "20", code: "AA" },
+                    { id: "21", code: "AB" }
+                ],
+                cadangan: ["E", "B"]
+            },
+            {
+                day: "Selasa, 10 Maret 2026",
+                slots: [
+                    { id: "1", code: "U" }, { id: "2", code: "AL" }, { id: "3", code: "AF" }, { id: "4", code: "Z" },
+                    { id: "5", code: "AJ" }, { id: "6", code: "AE" }, { id: "7", code: "D" }, { id: "8", code: "AK" },
+                    { id: "9", code: "W" }, { id: "10", code: "AA" }, { id: "11", code: "N" }, { id: "12", code: "AH" },
+                    { id: "13", code: "X" }, { id: "14", code: "Q" }, { id: "15", code: "AB" }, { id: "16", code: "AH" },
+                    { id: "17", code: "R" }, { id: "18", code: "AC" }, { id: "19", code: "AI" }, { id: "20", code: "AO" },
+                    { id: "21", code: "AG" }
+                ],
+                cadangan: ["E", "I"]
+            },
+            {
+                day: "Rabu, 11 Maret 2026",
+                slots: [
+                    { id: "1", code: "B" }, { id: "2", code: "AA" }, { id: "3", code: "AK" }, { id: "4", code: "D" },
+                    { id: "5", code: "U" }, { id: "6", code: "AF" }, { id: "7", code: "H" }, { id: "8", code: "W" },
+                    { id: "9", code: "Y" }, { id: "10", code: "I" }, { id: "11", code: "AJ" }, { id: "12", code: "X" },
+                    { id: "13", code: "AM" }, { id: "14", code: "N" }, { id: "15", code: "V" }, { id: "16", code: "AI" },
+                    { id: "17", code: "AE" }, { id: "18", code: "AO" }, { id: "19", code: "AC" }, { id: "20", code: "Q" },
+                    { id: "21", code: "R" }
+                ],
+                cadangan: ["E", "Z"]
+            },
+            {
+                day: "Kamis, 12 Maret 2026",
+                slots: [
+                    { id: "1", code: "D" }, { id: "2", code: "B" }, { id: "3", code: "H" }, { id: "4", code: "I" },
+                    { id: "5", code: "N" }, { id: "6", code: "Q" }, { id: "7", code: "R" }, { id: "8", code: "U" },
+                    { id: "9", code: "AL" }, { id: "10", code: "W" }, { id: "11", code: "X" }, { id: "12", code: "Y" },
+                    { id: "13", code: "Z" }, { id: "14", code: "AA" }, { id: "15", code: "AB" }, { id: "16", code: "AC" },
+                    { id: "17", code: "AE" }, { id: "18", code: "AF" }, { id: "19", code: "AG" }, { id: "20", code: "AH" },
+                    { id: "21", code: "AI" }
+                ],
+                cadangan: ["E", "AJ"]
+            },
+            {
+                day: "Jumat, 13 Maret 2026",
+                slots: [
+                    { id: "1", code: "AA" }, { id: "2", code: "AB" }, { id: "3", code: "AC" }, { id: "4", code: "AF" },
+                    { id: "5", code: "AG" }, { id: "6", code: "AH" }, { id: "7", code: "AI" }, { id: "8", code: "AK" },
+                    { id: "9", code: "AL" }, { id: "10", code: "AM" }, { id: "11", code: "AO" }, { id: "12", code: "D" },
+                    { id: "13", code: "H" }, { id: "14", code: "I" }, { id: "15", code: "N" }, { id: "16", code: "Q" },
+                    { id: "17", code: "R" }, { id: "18", code: "U" }, { id: "19", code: "V" }, { id: "20", code: "W" },
+                    { id: "21", code: "X" }
+                ],
+                cadangan: ["E", "Y"]
+            }
+        ];
+
+        const container = document.getElementById('scheduleContainer');
+        const searchInput = document.getElementById('searchInput');
+        const noResult = document.getElementById('noResult');
+        const tabContainer = document.getElementById('tabContainer');
+
+        let activeTabIndex = 0; // Default ke hari pertama (Senin)
+
+        function getTeacherName(code) {
+            return teachers[code] || "Nama Tidak Terdaftar";
+        }
+
+        function renderTabs() {
+            tabContainer.innerHTML = '';
+            rawSchedule.forEach((dayData, index) => {
+                const dayName = dayData.day.split(',')[0]; // "Senin", "Selasa", dll.
+                const btn = document.createElement('button');
+                
+                if (index === activeTabIndex) {
+                    btn.className = "flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold bg-white text-blue-700 shadow-sm transition-all";
+                } else {
+                    btn.className = "flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-medium bg-white/20 text-blue-100 hover:bg-white/30 transition-all";
+                }
+                
+                btn.textContent = dayName;
+                btn.onclick = () => {
+                    activeTabIndex = index;
+                    renderTabs();
+                    renderSchedule(searchInput.value);
+                    // Geser scroll tab agar tombol yang diklik terlihat di tengah (berguna di layar kecil)
+                    btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                };
+                tabContainer.appendChild(btn);
+            });
+        }
+
+        function renderSchedule(filterText = "") {
+            container.innerHTML = "";
+            let hasVisibleCards = false;
+            filterText = filterText.toLowerCase();
+
+            // Hanya proses data untuk hari yang aktif/dipilih
+            const dayData = rawSchedule[activeTabIndex];
+
+            // Filter Slots
+            const filteredSlots = dayData.slots.filter(slot => {
+                const name = getTeacherName(slot.code).toLowerCase();
+                const code = slot.code.toLowerCase();
+                return name.includes(filterText) || code === filterText;
+            });
+
+            // Filter Cadangan
+            const cadanganMatches = dayData.cadangan.filter(c => {
+                const name = getTeacherName(c).toLowerCase();
+                const code = c.toLowerCase();
+                // Jika user mencari "cadangan", tampilkan semua cadangan
+                return name.includes(filterText) || code === filterText || "cadangan".includes(filterText);
+            });
+
+            // Tampilkan data jika ada jadwal reguler yang cocok ATAU ada cadangan yang cocok ATAU tidak ada filter
+            if (filterText === "" || filteredSlots.length > 0 || cadanganMatches.length > 0) {
+                hasVisibleCards = true;
+                
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-5";
+
+                // Header Hari
+                let html = `
+                    <div class="bg-indigo-50/50 px-4 py-3 border-b border-slate-100 flex items-center">
+                        <svg class="w-5 h-5 text-indigo-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        <h2 class="text-base font-bold text-slate-800">${dayData.day}</h2>
+                    </div>
+                    <div class="divide-y divide-slate-100">
+                `;
+
+                // Body List Slots
+                const slotsToRender = filterText === "" ? dayData.slots : filteredSlots;
+                
+                if (slotsToRender.length > 0) {
+                    slotsToRender.forEach(slot => {
+                        html += `
+                            <div class="flex items-center p-3 hover:bg-slate-50 transition-colors">
+                                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-sm mr-3 border border-blue-200">
+                                    ${slot.id}
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-semibold text-slate-800 truncate">${getTeacherName(slot.code)}</p>
+                                    <p class="text-xs text-slate-500 mt-0.5">Kode: <span class="font-medium text-indigo-600">${slot.code}</span></p>
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else if (filterText !== "" && cadanganMatches.length > 0) {
+                     html += `
+                        <div class="p-4 text-center text-sm text-slate-500 italic">
+                            Tidak ada jam reguler, bertugas sebagai cadangan.
+                        </div>
+                    `;
+                }
+
+                html += `</div>`;
+
+                // Cadangan Section
+                // Jika sedang mencari, sorot yang dicari. Jika tidak, tampilkan semua.
+                const cadanganToRender = filterText === "" ? dayData.cadangan : (cadanganMatches.length > 0 ? cadanganMatches : dayData.cadangan);
+                
+                if (cadanganToRender.length > 0) {
+                    const cadanganList = cadanganToRender.map(c => `
+                        <li class="flex items-center space-x-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span>
+                            <span class="text-sm font-medium text-slate-800">${getTeacherName(c)} <span class="text-orange-600 text-xs">(${c})</span></span>
+                        </li>
+                    `).join('');
+
+                    html += `
+                        <div class="bg-orange-50/70 p-3 border-t border-orange-100">
+                            <div class="flex items-center mb-1">
+                                <svg class="w-4 h-4 text-orange-600 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <h3 class="text-xs font-bold text-orange-800 uppercase tracking-wide">Tim Cadangan</h3>
+                            </div>
+                            <ul class="space-y-1 ml-5">
+                                ${cadanganList}
+                            </ul>
+                        </div>
+                    `;
+                }
+
+                card.innerHTML = html;
+                container.appendChild(card);
+            }
+
+            if (hasVisibleCards) {
+                noResult.classList.add('hidden');
+                container.classList.remove('hidden');
+            } else {
+                noResult.classList.remove('hidden');
+                container.classList.add('hidden');
+            }
+        }
+
+        // Event Listener untuk fitur cari
+        searchInput.addEventListener('input', (e) => {
+            renderSchedule(e.target.value);
+        });
+
+        // Initial Render
+        renderTabs();
+        renderSchedule();
+
+    </script>
+</body>
+</html>
