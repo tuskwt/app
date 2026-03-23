@@ -1,16 +1,16 @@
 [
   {
-    "id": "jadwal-tes-2025-2026-0674",
-    "name": "Jadwal Tes 2025/2026",
-    "path": "projects/jadwal-tes/index.html",
-    "icon": "list",
-    "gradient": "icon-grad-4"
-  },
-  {
     "id": "jadwal-mengajarku",
     "name": "Jadwal Mengajar",
     "path": "projects/jadwal-mengajarku/index.html",
     "icon": "menu_book",
+    "gradient": "icon-grad-1"
+  },
+  {
+    "id": "kode-guru-9884",
+    "name": "Kode Guru",
+    "path": "projects/kode-guru/index.html",
+    "icon": "group",
     "gradient": "icon-grad-1"
   },
   {
@@ -21,24 +21,10 @@
     "gradient": "icon-grad-2"
   },
   {
-    "id": "jadwal-puasa-2026-5440",
-    "name": "Jadwal Puasa 2026",
-    "path": "projects/jadwal-puasa/index.html",
-    "icon": "mosque",
-    "gradient": "icon-grad-5"
-  },
-  {
     "id": "al-quran-digital-9342",
     "name": "Al-Quran Digital",
     "path": "projects/alquran-digital/index.html",
     "icon": "book_2",
     "gradient": "icon-grad-5"
-  },
-  {
-    "id": "kode-guru-9884",
-    "name": "Kode Guru",
-    "path": "projects/kode-guru/index.html",
-    "icon": "group",
-    "gradient": "icon-grad-1"
   }
 ]
