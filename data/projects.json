@@ -7,6 +7,13 @@
     "gradient": "icon-grad-1"
   },
   {
+    "id": "jadwal-pel--kelas-9194",
+    "name": "Jadwal Pel. Kelas",
+    "path": "projects/jadwal-kelas/index.html",
+    "icon": "list",
+    "gradient": "icon-grad-4"
+  },
+  {
     "id": "kode-guru-9884",
     "name": "Kode Guru",
     "path": "projects/kode-guru/index.html",
