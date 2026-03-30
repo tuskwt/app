@@ -825,6 +825,123 @@ const appData = {
                     }
                 ]
             }
+        },
+        {
+            "id": "1774863122752",
+            "name": "Heskia",
+            "code": "AM",
+            "schedule": {
+                "Senin": [
+                    {
+                        "periods": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "class": "X TJKT & X DKV (IPAS-KODING-KA)"
+                    },
+                    {
+                        "periods": [
+                            6,
+                            7
+                        ],
+                        "class": "X TSM.2 (Informatika)"
+                    },
+                    {
+                        "periods": [
+                            10,
+                            11
+                        ],
+                        "class": "X TKR (Informatika)"
+                    }
+                ],
+                "Selasa": [
+                    {
+                        "periods": [
+                            1,
+                            2
+                        ],
+                        "class": "X TSM.2 (Informatika)"
+                    },
+                    {
+                        "periods": [
+                            6,
+                            7,
+                            8
+                        ],
+                        "class": "X TJKT & X DKV (IPAS-KODING-KA)"
+                    },
+                    {
+                        "periods": [
+                            3,
+                            4
+                        ],
+                        "class": "X TSM.3 (Informatika)"
+                    }
+                ],
+                "Rabu": [
+                    {
+                        "periods": [
+                            1,
+                            2
+                        ],
+                        "class": "X TJKT & X DKV (Informatika)"
+                    },
+                    {
+                        "periods": [
+                            7,
+                            8
+                        ],
+                        "class": "X TSM.1 (Informatika)"
+                    },
+                    {
+                        "periods": [
+                            9,
+                            10
+                        ],
+                        "class": "X TP (Informatika)"
+                    }
+                ],
+                "Kamis": [
+                    {
+                        "periods": [
+                            1,
+                            2
+                        ],
+                        "class": "X TP (Informatika)"
+                    },
+                    {
+                        "periods": [
+                            3,
+                            4
+                        ],
+                        "class": "X TSM.3 (Informatika)"
+                    },
+                    {
+                        "periods": [
+                            9,
+                            10
+                        ],
+                        "class": "X TKR (Informatika)"
+                    },
+                    {
+                        "periods": [
+                            5,
+                            6
+                        ],
+                        "class": "X TJKT & X DKV (Informatika)"
+                    }
+                ],
+                "Jumat": [
+                    {
+                        "periods": [
+                            1,
+                            2
+                        ],
+                        "class": "X TSM.1 (Informatika)"
+                    }
+                ]
+            }
         }
     ]
 };
