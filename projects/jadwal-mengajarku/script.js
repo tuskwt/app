@@ -269,7 +269,7 @@ function renderSchedule(autoScroll = true) {
             shiftControlHtml = `
                 <button class="shift-toggle-btn ${currentShift > 0 ? 'active' : ''}" 
                         onclick="toggleDayShift('${day}')">
-                    ${currentShift > 0 ? 'Normal' : 'Maju 1X'}
+                    ${currentShift > 0 ? 'Kembalikan Normal' : 'Majukan 1X'}
                 </button>
             `;
         }
