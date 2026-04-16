@@ -273,7 +273,7 @@ const appData = {
     "teachers": [
         {
             "id": "AK",
-            "name": "X TP (Wali: Hanshel)",
+            "name": "X TP",
             "code": "AK",
             "schedule": {
                 "Senin": [
@@ -433,7 +433,7 @@ const appData = {
         },
         {
             "id": "1767538606199",
-            "name": "X TSM.2 (Wali: Den)",
+            "name": "X TSM.2",
             "code": "AG",
             "schedule": {
                 "Senin": [
@@ -603,7 +603,7 @@ const appData = {
         },
         {
             "id": "1774861585844",
-            "name": "X TJKT & X DKV (Wali: Bang Tyox)",
+            "name": "X TJKT & X DKV)",
             "code": "U",
             "schedule": {
                 "Senin": [
